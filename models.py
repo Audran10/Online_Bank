@@ -13,7 +13,7 @@ class Users:
         self.address = address
         self.role = role
 
-class Account:
+class Accounts:
     def __init__(self, id_account, id_user, cart_nb, name, solde, creation_date, end_date):
         self.id_account = id_account
         self.id_user = id_user
@@ -23,7 +23,7 @@ class Account:
         self.creation_date = creation_date
         self.end_date = end_date
 
-class Loan:
+class Loans:
     def __init__(self, id_loan, id_account, duration, loan_amount, interest, amount_reimbursed, monthly_payment, start_date, end_date, status):
         self.id_loan = id_loan
         self.id_account = id_account
@@ -36,7 +36,7 @@ class Loan:
         self.end_date = end_date
         self.status = status
 
-class Transaction:
+class Transactions:
     def __init__(self, id_transaction, id_account, store_name, operation_type, amount, transaction_date):
         self.id_transaction = id_transaction
         self.id_account = id_account
@@ -51,54 +51,66 @@ def create_db():
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Users (
-            id_user SERIAL PRIMARY KEY, 
-            first_name STRING NOT NULL,
-            last_name STRING NOT NULL,
-            gender STRING NOT NULL,
-            email STRING NOT NULL,
-            password STRING NOT NULL,
-            phone_number int NOT NULL,
+            id_user INTEGER PRIMARY KEY AUTOINCREMENT, 
+            first_name TEXT NOT NULL,
+            last_name TEXT NOT NULL,
+            gender TEXT NOT NULL,
+            email TEXT NOT NULL,
+            password TEXT NOT NULL,
+            phone_number INTEGER NOT NULL,
             birthday DATE NOT NULL,
-            address STRING NOT NULL,
-            role STRING NOT NULL
-        )
+            address TEXT NOT NULL,
+            role TEXT NOT NULL
+        );
+    ''')
 
-        CREATE TABLE IF NOT EXISTS Account (
-            id_account SERIAL PRIMARY KEY,
-            id_user SERIAL FOREIGN KEY REFERENCES Users(id_user),
-            cart_nb int NOT NULL,
-            name STRING NOT NULL,
-            solde int NOT NULL,
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS Accounts (
+            id_account INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_user INTEGER NOT NULL,
+            cart_nb INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            solde INTEGER NOT NULL,
             creation_date DATE NOT NULL,
-            end_date DATE
-        )
+            end_date DATE,
+            FOREIGN KEY (id_user) REFERENCES Users(id_user)
+        );
+    ''')
 
-        CREATE TABLE IF NOT EXISTS Bank_account (
-            id_bank_account SERIAL PRIMARY KEY,
-            id_account SERIAL FOREIGN KEY REFERENCES Account(id_account),
-        )
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS Bank_accounts (
+            id_bank_account INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_account INTEGER NOT NULL,
+            FOREIGN KEY (id_account) REFERENCES Account(id_account)
+        );
+    ''')
 
-        CREATE TABLE IF NOT EXISTS Loan (
-            id_loan SERIAL PRIMARY KEY,
-            id_account SERIAL FOREIGN KEY REFERENCES Account(id_account),
-            duration string NOT NULL,
-            loan_amount int NOT NULL,
-            interest int NOT NULL,
-            amount_reimbursed int NOT NULL,
-            monthly_payment int NOT NULL,
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS Loans (
+            id_loan INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_account INTEGER NOT NULL,
+            duration TEXT NOT NULL,
+            loan_amount INTEGER NOT NULL,
+            interest INTEGER NOT NULL,
+            amount_reimbursed INTEGER NOT NULL,
+            monthly_payment INTEGER NOT NULL,
             start_date DATE NOT NULL,
             end_date DATE NOT NULL,
-            status STRING NOT NULL
-        )
+            status TEXT NOT NULL,
+            FOREIGN KEY (id_account) REFERENCES Account(id_account)
+        );
+    ''')
 
-        CREATE TABLE IF NOT EXISTS Transaction (
-            id_transaction SERIAL PRIMARY KEY,
-            id_account SERIAL FOREIGN KEY REFERENCES Account(id_account),
-            store_name STRING NOT NULL,
-            operation_type STRING NOT NULL,
-            amount int NOT NULL,
-            transaction_date DATE NOT NULL
-        )
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS Transactions (
+            id_transaction INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_account INTEGER NOT NULL,
+            store_name TEXT NOT NULL,
+            operation_type TEXT NOT NULL,
+            amount INTEGER NOT NULL,
+            transaction_date DATE NOT NULL,
+            FOREIGN KEY (id_account) REFERENCES Account(id_account)
+        );
     ''')
 
     conn.commit()
