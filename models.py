@@ -1,5 +1,7 @@
 import sqlite3
 
+all_users = []
+
 class Users:
     def __init__(self, id_user, first_name, last_name, gender, email, password, phone_number, birthday, address, role):
         self.id_user = id_user
@@ -12,6 +14,17 @@ class Users:
         self.birthday = birthday
         self.address = address
         self.role = role
+    
+    def user_list():
+        conn = sqlite3.connect('app.db')
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM Users')
+        users = cursor.fetchall()
+        for user in users:
+            new_user= Users(user[0], user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8], user[9])
+            all_users.append(new_user)
+        return all_users
+
 
 class Accounts:
     def __init__(self, id_account, id_user, cart_nb, name, solde, creation_date, end_date):
@@ -22,6 +35,7 @@ class Accounts:
         self.solde = solde
         self.creation_date = creation_date
         self.end_date = end_date
+
 
 class Loans:
     def __init__(self, id_loan, id_account, duration, loan_amount, interest, amount_reimbursed, monthly_payment, start_date, end_date, status):
@@ -35,6 +49,7 @@ class Loans:
         self.start_date = start_date
         self.end_date = end_date
         self.status = status
+
 
 class Transactions:
     def __init__(self, id_transaction, id_account, store_name, operation_type, amount, transaction_date):
@@ -57,7 +72,7 @@ def create_db():
             gender TEXT NOT NULL,
             email TEXT NOT NULL,
             password TEXT NOT NULL,
-            phone_number INTEGER NOT NULL,
+            phone_number TEXT NOT NULL,
             birthday DATE NOT NULL,
             address TEXT NOT NULL,
             role TEXT NOT NULL
