@@ -1,7 +1,5 @@
 import sqlite3
 
-all_users = []
-
 class Users:
     def __init__(self, id_user, first_name, last_name, gender, email, password, phone_number, birthday, address, role):
         self.id_user = id_user

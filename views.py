@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, session
+from flask import Flask, render_template, request, flash, session, redirect, url_for
 import hashlib
 from models import *
 import sqlite3
@@ -12,7 +12,6 @@ def index():
     user = None
     if 'user_id' in session:
         user = Users.get_user_by_id(session['user_id'])
-        render_template('index.html')
     return render_template('index.html', user=user)
 
 
@@ -41,11 +40,12 @@ def signup():
             if password != correct_password:
                 flash("Les mots de passe ne correspondent pas")
             else:
-                hashed_password = Bcrypt().generate_password_hash(password)
                 cursor.execute("INSERT INTO Users (first_name, last_name, gender, email, password, phone_number, birthday, address, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (first_name, last_name, gender, email, password, phone_number, birthday, address, role))
                 conn.commit()
                 conn.close()
-                return render_template('index.html')
+                user = Users.get_user_by_email(email, password)
+                session['user_id'] = user.id_user
+                return redirect(url_for('index'))
 
     return render_template('signup.html')
 
@@ -58,10 +58,17 @@ def login():
         user = Users.get_user_by_email(email, password)
         if user != None:
             session['user_id'] = user.id_user
-            render_template('index.html')
+            return redirect(url_for('index'))
         else:
             flash("Email ou mot de passe incorrect")
     return render_template('login.html')
+
+
+@app.route('/profil')
+def profil():
+    if 'user_id' in session:
+        user = Users.get_user_by_id(session['user_id'])
+    return render_template('profil.html', user=user)
 
 
 if __name__ == "__main__":

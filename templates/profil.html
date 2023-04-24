@@ -4,19 +4,15 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="../static/profil.css">
+    <title>Profil</title>
 </head>
 <body>
-    <a href="{{url_for('signup')}}">HELLO</a>
-    <a href="{{url_for('login')}}">log</a>
-    <a href="{{url_for('profil')}}">profil</a>
-    <a href="{{url_for('index')}}">home</a>
-    
-    <div>
+    <div class="menu">
         {% if user %}
-        Bonjour {{ user.first_name }}
+        {{ user.first_name }}
         {% else %}
-        Vous n'êtes pas connecté
+        <div>Vous n'êtes pas connecté</div>
         {% endif %}
     </div>
 </body>
