@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request, flash
+from flask import Flask, render_template, request, flash, session
+import hashlib
 from models import *
 import sqlite3
-from pprint import pprint
 
 app = Flask(__name__)
 app.secret_key = "YP0VRND5VDXEhnC8gTABzjLU4C9obISR"
@@ -9,8 +9,11 @@ app.secret_key = "YP0VRND5VDXEhnC8gTABzjLU4C9obISR"
 
 @app.route('/')
 def index():
-    create_db()
-    return render_template('index.html')
+    user = None
+    if 'user_id' in session:
+        user = Users.get_user_by_id(session['user_id'])
+        render_template('index.html')
+    return render_template('index.html', user=user)
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -24,6 +27,7 @@ def signup():
         gender = request.form['gender']
         email = request.form['email']
         password = request.form['password']
+        correct_password = request.form['confirm_password']
         phone_number = request.form['phone']
         birthday = request.form['birthday']
         address = request.form['address']
@@ -34,18 +38,32 @@ def signup():
         if existing_user != None:
             flash("Compte bancaire déjà existant")
         else:
-            cursor.execute("INSERT INTO Users (first_name, last_name, gender, email, password, phone_number, birthday, address, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (first_name, last_name, gender, email, password, phone_number, birthday, address, role))
-            conn.commit()
-            conn.close()
-            return render_template('index.html')
+            if password != correct_password:
+                flash("Les mots de passe ne correspondent pas")
+            else:
+                hashed_password = Bcrypt().generate_password_hash(password)
+                cursor.execute("INSERT INTO Users (first_name, last_name, gender, email, password, phone_number, birthday, address, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (first_name, last_name, gender, email, password, phone_number, birthday, address, role))
+                conn.commit()
+                conn.close()
+                return render_template('index.html')
 
     return render_template('signup.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    Users.user_list()
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        user = Users.get_user_by_email(email, password)
+        if user != None:
+            session['user_id'] = user.id_user
+            render_template('index.html')
+        else:
+            flash("Email ou mot de passe incorrect")
     return render_template('login.html')
 
+
 if __name__ == "__main__":
+    create_db()
     app.run()

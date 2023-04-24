@@ -14,16 +14,28 @@ class Users:
         self.birthday = birthday
         self.address = address
         self.role = role
-    
-    def user_list():
+
+    def get_user_by_email(email, password):
         conn = sqlite3.connect('app.db')
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM Users')
-        users = cursor.fetchall()
-        for user in users:
-            new_user= Users(user[0], user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8], user[9])
-            all_users.append(new_user)
-        return all_users
+        cursor.execute('SELECT * FROM Users WHERE email = ? AND password = ?', (email, password))
+        user = cursor.fetchone()
+        if user != None:
+            new_user = Users(user[0], user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8], user[9])
+            return new_user
+        else:
+            return None
+    
+    def get_user_by_id(id_user):
+        conn = sqlite3.connect('app.db')
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM Users WHERE id_user = ?', (id_user,))
+        user = cursor.fetchone()
+        if user != None:
+            new_user = Users(user[0], user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8], user[9])
+            return new_user
+        else:
+            return None
 
 
 class Accounts:
