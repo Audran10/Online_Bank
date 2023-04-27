@@ -32,21 +32,21 @@
     <div>
         <div class="transactions container mt-4">
             <h3>Transactions</h3>
-            <form>
+            <form method="POST" action="/transactions">
                 <div class="form-group">
-                    <label for="operationType" class="form-label">Operation Type</label>
-                    <select class="form-control" id="operationType">
-                        <option>Debit</option>
-                        <option>Credit</option>
+                    <label for="operation_type" class="form-label">Operation Type</label>
+                    <select class="form-control" name="operation_type" id="operationType">
+                        <option value="debit">Debit</option>
+                        <option value="credit">Credit</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="inputDescription">Beneficiary Name</label>
-                    <input type="text" class="form-control" id="inputBeneficiaryName" placeholder="Enter beneficiary name">
+                    <label for="input_description">Beneficiary Name</label>
+                    <input type="text" class="form-control" name="beneficiary_name" id="input_beneficiary_name" placeholder="Enter beneficiary name">
                 </div>
                 <div class="form-group">
-                    <label for="inputAmount">Amount</label>
-                    <input type="number" class="form-control" id="inputAmount" placeholder="Enter amount" min="1">
+                    <label for="input_amount">Amount</label>
+                    <input type="number" class="form-control" name="amount" id="input_amount" placeholder="Enter amount" min="1">
                 </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>
