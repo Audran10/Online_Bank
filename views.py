@@ -9,13 +9,35 @@ app = Flask(__name__)
 app.secret_key = "YP0VRND5VDXEhnC8gTABzjLU4C9obISR"
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
     user = None
+    accounts = None
     if 'user_id' in session:
         user = Users.get_user_by_id(session['user_id'])
-        accounts = Accounts.get_accounts_by_user(user.id_user)
-    return render_template('index.html', user=user, accounts=accounts)
+        if user != None:
+            accounts = Accounts.get_accounts_by_user(user.id_user)
+            credits = Transactions.get_credit_by_account(accounts[0].id_account)
+            print(credits)
+    return render_template('index.html', user=user, accounts=accounts, credits=credits)
+
+@app.route('/add_income', methods=['POST'])
+def add_income():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    user_id = session['user_id']
+    account = Accounts.get_account_by_user_and_name(user_id, "Compte courant")
+
+    amount = request.form.get('amount')
+    date = datetime.date.today()
+
+    conn = sqlite3.connect('app.db')
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO Monthly_incomes (id_account, amount, date) VALUES (?, ?, ?)", (account.id_account, amount, date))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('index'))
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -46,8 +68,6 @@ def signup():
                 cursor.execute("INSERT INTO Users (first_name, last_name, gender, email, password, phone_number, birthday, address, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (first_name, last_name, gender, email, password, phone_number, birthday, address, role))
                 conn.commit()
                 user = Users.get_user_by_email(email, password)
-                print(user)
-                print(user.id_user)
                 session['user_id'] = user.id_user
 
                 new_cart_nb = random.randint(10**15, 10**16-1)

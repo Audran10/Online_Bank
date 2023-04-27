@@ -54,6 +54,10 @@
                 },
             });
         </script>
+        <form action="{{url_for('add_income')}}" method="POST">
+            <input type="number" name="amount" placeholder="Montant">
+            <input type="submit" value="Ajouter">
+        </form>
         {% else %}
         Vous n'êtes pas connecté
         {% endif %}

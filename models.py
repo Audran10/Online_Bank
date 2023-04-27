@@ -1,4 +1,6 @@
 import sqlite3
+import json
+import datetime
 
 class Users:
     def __init__(self, id_user, first_name, last_name, gender, email, password, phone_number, birthday, address, role):
@@ -56,9 +58,40 @@ class Accounts:
             for account in accounts:
                 new_account = Accounts(account[0], account[1], account[2], account[3], account[4], account[5], account[6])
                 new_accounts.append(new_account)
+            conn.close()
             return new_accounts
         else:
             return None
+    
+    def get_account_by_user_and_name(id_user, name):
+        conn = sqlite3.connect('app.db')
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM Accounts WHERE id_user = ? AND name = ?', (id_user, name))
+        account = cursor.fetchone()
+        if account != None:
+            new_account = Accounts(account[0], account[1], account[2], account[3], account[4], account[5], account[6])
+            return new_account
+        else:
+            return None
+
+# class Monthly_incomes:
+#     def __init__(self, id_monthly_income, id_account, amount, date):
+#         self.id_monthly_income = id_monthly_income
+#         self.id_account = id_account
+#         self.amount = amount
+#         self.date = date
+    
+#     def get_monthly_incomes_by_account(id_account):
+#         conn = sqlite3.connect('app.db')
+#         cursor = conn.cursor()
+#         cursor.execute('SELECT amount FROM Monthly_incomes WHERE id_account = ? ORDER BY id_monthly_income DESC', (id_account,))
+#         monthly_incomes = cursor.fetchall()
+#         conn.close()
+#         if monthly_incomes != None:
+#             new_monthly_incomes = [monthly_income[0] for monthly_income in monthly_incomes]
+#             return new_monthly_incomes
+#         else:
+#             return None
 
 
 class Loans:
@@ -76,13 +109,26 @@ class Loans:
 
 
 class Transactions:
-    def __init__(self, id_transaction, id_account, store_name, operation_type, amount, transaction_date):
+    def __init__(self, id_transaction, id_account, beneficiary_name, operation_type, amount, transaction_date):
         self.id_transaction = id_transaction
         self.id_account = id_account
-        self.store_name = store_name
+        self.beneficiary_name = beneficiary_name
         self.operation_type = operation_type
         self.amount = amount
         self.transaction_date = transaction_date
+    
+    def get_credit_by_account(id_account):
+        conn = sqlite3.connect('app.db')
+        cursor = conn.cursor()
+        credit = "Credit"
+        month = datetime.datetime.now().month
+        year = datetime.datetime.now().year
+        start_date = datetime.datetime(year, month, 1).strftime('%Y-%m-%d')
+        end_date = datetime.datetime(year, month+1, 1).strftime('%Y-%m-%d')
+        cursor.execute('SELECT SUM(amount) FROM Transactions WHERE id_account = ? AND operation_type = ? AND transaction_date BETWEEN ? AND ?', (id_account, credit, start_date, end_date))
+        credit_sum = cursor.fetchone()[0]
+        conn.close()
+        return credit_sum
 
 
 def create_db():
@@ -116,13 +162,15 @@ def create_db():
         );
     ''')
 
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS Bank_accounts (
-            id_bank_account INTEGER PRIMARY KEY AUTOINCREMENT,
-            id_account INTEGER NOT NULL,
-            FOREIGN KEY (id_account) REFERENCES Account(id_account)
-        );
-    ''')
+    # cursor.execute('''
+    #     CREATE TABLE IF NOT EXISTS Monthly_incomes (
+    #         id_monthly_income INTEGER PRIMARY KEY AUTOINCREMENT,
+    #         id_account INTEGER NOT NULL,
+    #         amount INTEGER NOT NULL,
+    #         date DATE NOT NULL,
+    #         FOREIGN KEY (id_account) REFERENCES Account(id_account)
+    #     );
+    # ''')
 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Loans (
@@ -144,7 +192,7 @@ def create_db():
         CREATE TABLE IF NOT EXISTS Transactions (
             id_transaction INTEGER PRIMARY KEY AUTOINCREMENT,
             id_account INTEGER NOT NULL,
-            store_name TEXT NOT NULL,
+            beneficiary_name TEXT NOT NULL,
             operation_type TEXT NOT NULL,
             amount INTEGER NOT NULL,
             transaction_date DATE NOT NULL,
