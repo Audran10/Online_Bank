@@ -5,6 +5,7 @@ import sqlite3
 import random
 import datetime
 
+
 app = Flask(__name__)
 app.secret_key = "YP0VRND5VDXEhnC8gTABzjLU4C9obISR"
 
@@ -65,11 +66,11 @@ def signup():
             if password != correct_password:
                 flash("Les mots de passe ne correspondent pas")
             else:
+                #hashed_password = hashlib.sha256(password.encode()).hexdigest()
                 cursor.execute("INSERT INTO Users (first_name, last_name, gender, email, password, phone_number, birthday, address, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (first_name, last_name, gender, email, password, phone_number, birthday, address, role))
                 conn.commit()
                 user = Users.get_user_by_email(email, password)
                 session['user_id'] = user.id_user
-
                 new_cart_nb = random.randint(10**15, 10**16-1)
                 cursor.execute("SELECT * FROM Accounts WHERE cart_nb = ?", (new_cart_nb,))
                 existing_cart_nb = cursor.fetchone()
@@ -77,7 +78,7 @@ def signup():
                     new_cart_nb += 1
                     cursor.execute("SELECT * FROM Accounts WHERE cart_nb = ?", (new_cart_nb,))
                     existing_cart_nb = cursor.fetchone()
-                current_date = datetime.date.today()
+                current_date = datetime.date.today().strftime("%d-%m-%Y")
                 cursor.execute("INSERT INTO Accounts (id_user, cart_nb, name, solde, creation_date) VALUES (?, ?, ?, ?, ?)", (user.id_user, new_cart_nb, "Compte courant", 50, current_date))
                 conn.commit()
                 conn.close()
@@ -107,6 +108,26 @@ def profil():
     return render_template('profil.html', user=user)
 
 
+@app.route('/transactions', methods=['GET', 'POST'])
+def transactions():
+    if 'user_id' in session:
+        conn = sqlite3.connect('app.db')
+        user = Users.get_user_by_id(session['user_id'])
+        if user != None:
+            accounts = Accounts.get_accounts_by_user(user.id_user)
+            if request.method == 'POST':
+                beneficiary_name = request.form['beneficiary_name']
+                operation_type = request.form['operation_type']
+                amount = request.form['amount']
+                transaction_date = datetime.date.today().strftime("%d-%m-%Y")
+                cursor = conn.cursor()
+                cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (accounts[0].id_account, beneficiary_name, operation_type, amount, transaction_date))
+                conn.commit()
+    return render_template('transactions.html', user=user, accounts=accounts)
+
+                
+
 if __name__ == "__main__":
     create_db()
     app.run()
+    

@@ -91,7 +91,7 @@ Création & Modification & Suppression de compte <br> <br>
 ```
 - transaction_id		int auto_increment (Primary key)
 - id_account		    int auto_increment (Foreign key)
-- store_name		    string NOT NULL
+- beneficiary_name		string NOT NULL
 - operation_type	    string NOT NULL
 - amount		        int NOT NULL
 - transaction_date	    date NOT NULL

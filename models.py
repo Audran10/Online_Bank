@@ -117,6 +117,7 @@ class Transactions:
         self.amount = amount
         self.transaction_date = transaction_date
     
+
     def get_credit_by_account(id_account):
         conn = sqlite3.connect('app.db')
         cursor = conn.cursor()
@@ -129,6 +130,21 @@ class Transactions:
         credit_sum = cursor.fetchone()[0]
         conn.close()
         return credit_sum
+
+    def get_transactions_details(id_account):
+        conn = sqlite3.connect('app.db')
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM Transactions WHERE id_account = ? ORDER BY id_transaction DESC', (id_account,))
+        transactions = cursor.fetchall()
+        if transactions != None:
+            new_transactions = []
+            for transaction in transactions:
+                new_transaction = Transactions(transaction[0], transaction[1], transaction[2], transaction[3], transaction[4], transaction[5])
+                new_transactions.append(new_transaction)
+            return new_transactions
+        else:
+            return None
+
 
 
 def create_db():
