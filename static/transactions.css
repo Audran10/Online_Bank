@@ -18,11 +18,7 @@ nav {
 
 body {
     background-color: rgb(238, 238, 238);
-}
-
-.graph-container {
-    width: 20%;
-    height: 20%;
+    overflow-x: hidden;
 }
 
 .footer {

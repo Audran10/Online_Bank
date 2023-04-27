@@ -76,13 +76,27 @@ class Loans:
 
 
 class Transactions:
-    def __init__(self, id_transaction, id_account, store_name, operation_type, amount, transaction_date):
+    def __init__(self, id_transaction, id_account, beneficiary_name, operation_type, amount, transaction_date):
         self.id_transaction = id_transaction
         self.id_account = id_account
-        self.store_name = store_name
+        self.beneficiary_name = beneficiary_name
         self.operation_type = operation_type
         self.amount = amount
         self.transaction_date = transaction_date
+    
+    def get_transactions_details(id_account):
+        conn = sqlite3.connect('app.db')
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM Transactions WHERE id_account = ? ORDER BY id_transaction DESC', (id_account,))
+        transactions = cursor.fetchall()
+        if transactions != None:
+            new_transactions = []
+            for transaction in transactions:
+                new_transaction = Transactions(transaction[0], transaction[1], transaction[2], transaction[3], transaction[4], transaction[5])
+                new_transactions.append(new_transaction)
+            return new_transactions
+        else:
+            return None
 
 
 def create_db():
@@ -144,7 +158,7 @@ def create_db():
         CREATE TABLE IF NOT EXISTS Transactions (
             id_transaction INTEGER PRIMARY KEY AUTOINCREMENT,
             id_account INTEGER NOT NULL,
-            store_name TEXT NOT NULL,
+            beneficiary_name TEXT NOT NULL,
             operation_type TEXT NOT NULL,
             amount INTEGER NOT NULL,
             transaction_date DATE NOT NULL,

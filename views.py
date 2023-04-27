@@ -12,9 +12,11 @@ app.secret_key = "YP0VRND5VDXEhnC8gTABzjLU4C9obISR"
 @app.route('/')
 def index():
     user = None
+    accounts = None
     if 'user_id' in session:
         user = Users.get_user_by_id(session['user_id'])
-        accounts = Accounts.get_accounts_by_user(user.id_user)
+        if user != None:
+            accounts = Accounts.get_accounts_by_user(user.id_user)
     return render_template('index.html', user=user, accounts=accounts)
 
 
@@ -43,6 +45,7 @@ def signup():
             if password != correct_password:
                 flash("Les mots de passe ne correspondent pas")
             else:
+                #hashed_password = hashlib.sha256(password.encode()).hexdigest()
                 cursor.execute("INSERT INTO Users (first_name, last_name, gender, email, password, phone_number, birthday, address, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (first_name, last_name, gender, email, password, phone_number, birthday, address, role))
                 conn.commit()
                 user = Users.get_user_by_email(email, password)
@@ -85,6 +88,16 @@ def profil():
     if 'user_id' in session:
         user = Users.get_user_by_id(session['user_id'])
     return render_template('profil.html', user=user)
+
+@app.route('/transactions')
+def transactions():
+    user = None
+    accounts = None
+    if 'user_id' in session:
+        user = Users.get_user_by_id(session['user_id'])
+        if user != None:
+            accounts = Accounts.get_accounts_by_user(user.id_user)
+    return render_template('transactions.html', user=user, accounts=accounts)
 
 
 if __name__ == "__main__":
