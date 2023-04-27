@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request, flash, session
+from flask import Flask, render_template, request, flash, session, redirect, url_for
 import hashlib
 from models import *
 import sqlite3
+import random
+import datetime
 
 app = Flask(__name__)
 app.secret_key = "YP0VRND5VDXEhnC8gTABzjLU4C9obISR"
@@ -12,8 +14,8 @@ def index():
     user = None
     if 'user_id' in session:
         user = Users.get_user_by_id(session['user_id'])
-        render_template('index.html')
-    return render_template('index.html', user=user)
+        accounts = Accounts.get_accounts_by_user(user.id_user)
+    return render_template('index.html', user=user, accounts=accounts)
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -41,11 +43,25 @@ def signup():
             if password != correct_password:
                 flash("Les mots de passe ne correspondent pas")
             else:
-                hashed_password = Bcrypt().generate_password_hash(password)
                 cursor.execute("INSERT INTO Users (first_name, last_name, gender, email, password, phone_number, birthday, address, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (first_name, last_name, gender, email, password, phone_number, birthday, address, role))
                 conn.commit()
+                user = Users.get_user_by_email(email, password)
+                print(user)
+                print(user.id_user)
+                session['user_id'] = user.id_user
+
+                new_cart_nb = random.randint(10**15, 10**16-1)
+                cursor.execute("SELECT * FROM Accounts WHERE cart_nb = ?", (new_cart_nb,))
+                existing_cart_nb = cursor.fetchone()
+                while existing_cart_nb != None:
+                    new_cart_nb += 1
+                    cursor.execute("SELECT * FROM Accounts WHERE cart_nb = ?", (new_cart_nb,))
+                    existing_cart_nb = cursor.fetchone()
+                current_date = datetime.date.today()
+                cursor.execute("INSERT INTO Accounts (id_user, cart_nb, name, solde, creation_date) VALUES (?, ?, ?, ?, ?)", (user.id_user, new_cart_nb, "Compte courant", 50, current_date))
+                conn.commit()
                 conn.close()
-                return render_template('index.html')
+                return redirect(url_for('index'))
 
     return render_template('signup.html')
 
@@ -58,10 +74,17 @@ def login():
         user = Users.get_user_by_email(email, password)
         if user != None:
             session['user_id'] = user.id_user
-            render_template('index.html')
+            return redirect(url_for('index'))
         else:
             flash("Email ou mot de passe incorrect")
     return render_template('login.html')
+
+
+@app.route('/profil')
+def profil():
+    if 'user_id' in session:
+        user = Users.get_user_by_id(session['user_id'])
+    return render_template('profil.html', user=user)
 
 
 if __name__ == "__main__":

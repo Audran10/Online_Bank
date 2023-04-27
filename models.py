@@ -1,7 +1,5 @@
 import sqlite3
 
-all_users = []
-
 class Users:
     def __init__(self, id_user, first_name, last_name, gender, email, password, phone_number, birthday, address, role):
         self.id_user = id_user
@@ -47,6 +45,20 @@ class Accounts:
         self.solde = solde
         self.creation_date = creation_date
         self.end_date = end_date
+    
+    def get_accounts_by_user(id_user):
+        conn = sqlite3.connect('app.db')
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM Accounts WHERE id_user = ? ORDER BY id_account ASC', (id_user,))
+        accounts = cursor.fetchall()
+        if accounts != None:
+            new_accounts = []
+            for account in accounts:
+                new_account = Accounts(account[0], account[1], account[2], account[3], account[4], account[5], account[6])
+                new_accounts.append(new_account)
+            return new_accounts
+        else:
+            return None
 
 
 class Loans:
