@@ -50,8 +50,6 @@ def signup():
                 cursor.execute("INSERT INTO Users (first_name, last_name, gender, email, password, phone_number, birthday, address, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (first_name, last_name, gender, email, password, phone_number, birthday, address, role))
                 conn.commit()
                 user = Users.get_user_by_email(email, password)
-                #print(user)
-                #print(user.id_user)
                 session['user_id'] = user.id_user
 
                 new_cart_nb = random.randint(10**15, 10**16-1)
@@ -109,7 +107,6 @@ def transactions():
     return render_template('transactions.html', user=user, accounts=accounts)
 
                 
-
 if __name__ == "__main__":
     create_db()
     app.run()

@@ -1,19 +1,33 @@
 nav {
-    background-color: white;
+    background-color:#2E835F;
 }
 
 .navbar-nav {
     margin-left: 75%;
+}
 
+.navbar-brand {
+    color : white;
+    margin-right: 20px;
+    margin-bottom: 5px;
+}
+
+.navbar-brand:hover {
+    border-bottom: 2px solid white;
+    color : white;
+    margin-bottom: 5px;
 }
 
 .nav-link {
-    color: black;
+    color : white;
     margin-right: 20px;
+    margin-bottom: 5px;
 }
 
 .nav-link:hover {
-    color: rgb(102, 204, 153);
+    border-bottom: 2px solid white;
+    color : white;
+    margin-bottom: 5px;
 }
 
 body {

@@ -6,7 +6,8 @@ body {
     display: flex;
     margin: 100px;
     overflow: hidden;
-    background-color:lightblue;
+    background-color:#2E835F;
+    color : white;
 }
 
 h1 {
