@@ -1,37 +1,26 @@
-html, body {
-    height: 100%;
+nav {
+    background-color: white;
+}
+
+.navbar-nav {
+    margin-left: 80%;
+
+}
+
+.nav-link {
+    color: black;
+    margin-right: 20px;
+}
+
+.nav-link:hover {
+    color: rgb(102, 204, 153);
 }
 
 body {
-    display: flex;
-    margin: 100px;
-    overflow: hidden;
-    background-color:lightblue;
+    background-color: rgb(238, 238, 238);
 }
 
-h1 {
-    text-align: center;
-    font-size: 50px;
+.graph-container {
+    width: 20%;
+    height: 20%;
 }
-
-.register, .login_button, .register_button {
-    text-align: center;
-}
-
-select {
-    height: 38px;
-    padding: 6px 12px;
-    font-size: 16px;
-    line-height: 1.42857143;
-    color: #555;
-    background-color: #fff;
-    background-image: none;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
-    -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-}
-  

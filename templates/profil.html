@@ -8,9 +8,11 @@
     <title>Profil</title>
 </head>
 <body>
-    <div class="menu">
+    <div>
         {% if user %}
-        {{ user.first_name }}
+        <div class="name">
+            {{ user.first_name }} {{ user.last_name }}
+        </div>
         {% else %}
         <div>Vous n'êtes pas connecté</div>
         {% endif %}

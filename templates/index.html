@@ -4,17 +4,56 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="../static/style.css">
+    <!-- <script src="../static/graph.js"></script> -->
     <title>Document</title>
 </head>
 <body>
-    <a href="{{url_for('signup')}}">HELLO</a>
-    <a href="{{url_for('login')}}">log</a>
-    <a href="{{url_for('profil')}}">profil</a>
-    <a href="{{url_for('index')}}">home</a>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="{{url_for('index')}}">Home</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+              <a class="nav-link" href="{{url_for('signup')}}">Signup</a>
+              <a class="nav-link" href="{{url_for('login')}}">Login</a>
+              <a class="nav-link" href="{{url_for('profil')}}">Profil</a>
+            </div>
+          </div>
+        </div>
+    </nav>
     
     <div>
         {% if user %}
-        Bonjour {{ user.first_name }}
+        Bonjour {{ user.first_name }} {{ user.last_name }}
+        <div class="graph-container">
+            <canvas id="circular-graph"></canvas>
+        </div>
+        <script>
+            const circular_graph = document.getElementById('circular-graph').getContext('2d');
+            // let account = '{{ accounts }}';
+            // let total = 0;
+
+            let myChart = new Chart(circular_graph, {
+                type: 'doughnut',
+                data: {
+                    labels: ["Solde"],
+                    datasets: [
+                        {
+                        label: "Solde",
+                        data: [10],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)'
+                        ],
+                        },
+                    ],
+                },
+            });
+        </script>
         {% else %}
         Vous n'êtes pas connecté
         {% endif %}
