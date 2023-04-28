@@ -74,25 +74,31 @@ class Accounts:
         else:
             return None
 
-# class Monthly_incomes:
-#     def __init__(self, id_monthly_income, id_account, amount, date):
-#         self.id_monthly_income = id_monthly_income
-#         self.id_account = id_account
-#         self.amount = amount
-#         self.date = date
-    
-#     def get_monthly_incomes_by_account(id_account):
-#         conn = sqlite3.connect('app.db')
-#         cursor = conn.cursor()
-#         cursor.execute('SELECT amount FROM Monthly_incomes WHERE id_account = ? ORDER BY id_monthly_income DESC', (id_account,))
-#         monthly_incomes = cursor.fetchall()
-#         conn.close()
-#         if monthly_incomes != None:
-#             new_monthly_incomes = [monthly_income[0] for monthly_income in monthly_incomes]
-#             return new_monthly_incomes
-#         else:
-#             return None
+class Monthly_saving:
+    def __init__(self, id_monthly_saving, id_account, amount, date):
+        self.id_monthly_saving = id_monthly_saving
+        self.id_account = id_account
+        self.amount = amount
+        self.date = date
 
+    def get_monthly_saving_by_account(id_account):
+        conn = sqlite3.connect('app.db')
+        cursor = conn.cursor()
+        cursor.execute('SELECT sum(amount) FROM Monthly_saving WHERE id_account = ? ORDER BY id_monthly_saving ASC', (id_account,))
+        monthly_saving = cursor.fetchone()[0]
+        if monthly_saving != None:
+            return monthly_saving
+        else:
+            return None
+        
+    
+    def add_monthly_saving(id_account, amount, date):
+        conn = sqlite3.connect('app.db')
+        cursor = conn.cursor()
+        cursor.execute('INSERT INTO Monthly_saving (id_account, amount, date) VALUES (?, ?, ?)', (id_account, amount, date))
+        cursor.execute('UPDATE Accounts SET solde = solde - ? WHERE id_account = ?', (amount, id_account))
+        conn.commit()
+        conn.close()
 
 class Loans:
     def __init__(self, id_loan, id_account, duration, loan_amount, interest, amount_reimbursed, monthly_payment, start_date, end_date, status):
@@ -121,17 +127,31 @@ class Transactions:
     def get_credit_by_account(id_account):
         conn = sqlite3.connect('app.db')
         cursor = conn.cursor()
-        credit = "Credit"
         month = datetime.datetime.now().month
         year = datetime.datetime.now().year
-        start_date = datetime.datetime(year, month, 1).strftime('%Y-%m-%d')
-        end_date = datetime.datetime(year, month+1, 1).strftime('%Y-%m-%d')
-        cursor.execute('SELECT SUM(amount) FROM Transactions WHERE id_account = ? AND operation_type = ? AND transaction_date BETWEEN ? AND ?', (id_account, credit, start_date, end_date))
+        start_date = datetime.datetime(year, month, 1).strftime('%d-%m-%Y')
+        end_date = (datetime.datetime(year, month+1, 1) - datetime.timedelta(days=1)).strftime('%d-%m-%Y')
+        print(start_date)
+        print(end_date)
+        cursor.execute("SELECT SUM(amount) FROM Transactions WHERE id_account = ? AND operation_type = 'credit' AND transaction_date BETWEEN ? AND ?", (id_account, start_date, end_date))
         credit_sum = cursor.fetchone()[0]
+        print(credit_sum)
         conn.close()
         return credit_sum
+    
+    def get_debit_by_account(id_account):
+        conn = sqlite3.connect('app.db')
+        cursor = conn.cursor()
+        month = datetime.datetime.now().month
+        year = datetime.datetime.now().year
+        start_date = datetime.datetime(year, month, 1).strftime('%d-%m-%Y')
+        end_date = (datetime.datetime(year, month+1, 1) - datetime.timedelta(days=1)).strftime('%d-%m-%Y')
+        cursor.execute("SELECT SUM(amount) FROM Transactions WHERE id_account = ? AND operation_type = 'debit' AND transaction_date BETWEEN ? AND ?", (id_account, start_date, end_date))
+        debit_sum = cursor.fetchone()[0]
+        conn.close()
+        return debit_sum
 
-    def get_transactions_details(id_account):
+    def get_transactions_by_account(id_account):
         conn = sqlite3.connect('app.db')
         cursor = conn.cursor()
         cursor.execute('SELECT * FROM Transactions WHERE id_account = ? ORDER BY id_transaction DESC', (id_account,))
@@ -178,15 +198,15 @@ def create_db():
         );
     ''')
 
-    # cursor.execute('''
-    #     CREATE TABLE IF NOT EXISTS Monthly_incomes (
-    #         id_monthly_income INTEGER PRIMARY KEY AUTOINCREMENT,
-    #         id_account INTEGER NOT NULL,
-    #         amount INTEGER NOT NULL,
-    #         date DATE NOT NULL,
-    #         FOREIGN KEY (id_account) REFERENCES Account(id_account)
-    #     );
-    # ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS Monthly_saving (
+            id_monthly_saving INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_account INTEGER NOT NULL,
+            amount INTEGER NOT NULL,
+            date DATE NOT NULL,
+            FOREIGN KEY (id_account) REFERENCES Account(id_account)
+        );
+    ''')
 
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Loans (

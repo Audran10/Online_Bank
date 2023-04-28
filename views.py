@@ -14,31 +14,28 @@ app.secret_key = "YP0VRND5VDXEhnC8gTABzjLU4C9obISR"
 def index():
     user = None
     accounts = None
+    credits = None
+    debits = None
+    monthly_saving = None
     if 'user_id' in session:
         user = Users.get_user_by_id(session['user_id'])
         if user != None:
             accounts = Accounts.get_accounts_by_user(user.id_user)
             credits = Transactions.get_credit_by_account(accounts[0].id_account)
-            print(credits)
-    return render_template('index.html', user=user, accounts=accounts, credits=credits)
+            debits = Transactions.get_debit_by_account(accounts[0].id_account)
+            transactions = Transactions.get_transactions_by_account(accounts[0].id_account)
+            monthly_saving = Monthly_saving.get_monthly_saving_by_account(accounts[0].id_account)
+    return render_template('index.html', user=user, accounts=accounts, credits=credits, debits=debits, transactions=transactions, monthly_saving=monthly_saving)
 
-@app.route('/add_income', methods=['POST'])
-def add_income():
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
 
-    user_id = session['user_id']
-    account = Accounts.get_account_by_user_and_name(user_id, "Compte courant")
-
-    amount = request.form.get('amount')
-    date = datetime.date.today()
-
-    conn = sqlite3.connect('app.db')
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO Monthly_incomes (id_account, amount, date) VALUES (?, ?, ?)", (account.id_account, amount, date))
-    conn.commit()
-    conn.close()
+@app.route('/monthly_saving', methods=['GET', 'POST'])
+def monthly_saving():
+    saving = request.form['saving']
+    accounts = Accounts.get_accounts_by_user(session['user_id'])
+    date = datetime.datetime.now().strftime("%Y-%m-%d")
+    Monthly_saving.add_monthly_saving(accounts[0].id_account, saving, date)
     return redirect(url_for('index'))
+
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -121,8 +118,18 @@ def transactions():
                 amount = request.form['amount']
                 transaction_date = datetime.date.today().strftime("%d-%m-%Y")
                 cursor = conn.cursor()
-                cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (accounts[0].id_account, beneficiary_name, operation_type, amount, transaction_date))
-                conn.commit()
+                if operation_type == "debit" and int(amount) > accounts[0].solde:
+                    flash("Solde insuffisant")
+                else:
+                    cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (accounts[0].id_account, beneficiary_name, operation_type, amount, transaction_date))
+                    conn.commit()
+                    if operation_type == "credit":
+                        cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (accounts[0].solde + int(amount), accounts[0].id_account))
+                        conn.commit()
+                    else:
+                        cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (accounts[0].solde - int(amount), accounts[0].id_account))
+                        conn.commit()
+                    
     return render_template('transactions.html', user=user, accounts=accounts)
 
                 
