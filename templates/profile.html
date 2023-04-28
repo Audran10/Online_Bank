@@ -31,7 +31,6 @@
     </nav>
     <div>
         <div class="transactions container mt-4">
-            {% if user %}
             <h3>Profile</h3>
             <h4>
               <img src="{{ url_for('static', filename='profile_icon.svg') }}" alt="SVG Image" class="profile_icon">
@@ -64,9 +63,10 @@
                     </div>
                 </div>
             </div>
-            <p class="update_button">
-              <button type="submit" class="btn btn-primary">Update</button>
-            </p>
+            <div class="saveButton">
+                <button class="saveBtn btn btn-primary" type=submit/>Update</button><br/>
+                <span class="successfully-saved">User info updated sucessfully</span>
+            </div>     
             <script>
                 const togglePassword = document.querySelector('#togglePassword');
                 const password = document.querySelector('#password');
@@ -85,9 +85,34 @@
                 });
             </script>                        
             </form> 
-            {% else %}
-            <h3>Veuillez vous connecter pour accéder à cette page</h3>
-            {% endif %}
+            <!--<form class="updateInfo">
+                <h5>Account information</h5>
+                <div class="form-group row">
+                    <div class="col">
+                        <label for="email">Email address</label>
+                        <input type="email" class="form-control" name="email" id="email" placeholder="{{ user.email }}">
+                    </div>
+                    <div class="col">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" class="form-control" name="phone" id="phone" placeholder="{{ user.phone_number }}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="address" class="form-control" name="address" id="address" placeholder="{{ user.address }}">
+                </div>
+                <div class="form-group">
+                  <label for="password">Password</label>
+                  <div class="input-group">
+                      <input type="password" class="form-control" name="password" id="password" placeholder="***********">
+                      <div class="input-group-append">
+                          <span class="input-group-text toggle-password" id="togglePassword">
+                              <img src="{{ url_for('static', filename='eye-fill.svg') }}" alt="Show Password" id="showPassword">
+                          </span>
+                      </div>
+                  </div>
+              </div>                 
+              </form> -->
         </div>
     </div>
     <div class="footer">

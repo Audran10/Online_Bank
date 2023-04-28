@@ -31,12 +31,13 @@ body {
 
 h3 {
     text-align: center;
-    margin-top: 50px;
+    margin-top: 20px;
+    font-size: 30px;
 }
 
 h4 {
     text-align: left;
-    margin-top: 50px;
+    margin-top: 20px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
     background-color: white;
     padding: 20px;

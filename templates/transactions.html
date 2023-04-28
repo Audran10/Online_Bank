@@ -10,7 +10,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="../static/transactions.css">
-    <script src="{{url_for('static', filename='transactions.js')}}"></script>
     <title>Transactions</title>
 </head>
 <body>
@@ -25,16 +24,15 @@
               <a class="nav-link" href="{{url_for('transactions')}}">Transactions</a>
               <a class="nav-link" href="{{url_for('signup')}}">Signup</a>
               <a class="nav-link" href="{{url_for('login')}}">Login</a>
-              <a class="nav-link" href="{{url_for('profile')}}">Profile</a>
+              <a class="nav-link" href="{{url_for('profile')}}">Profil</a>
             </div>
           </div>
         </div>
     </nav>
     <div>
         <div class="transactions container mt-4">
-            {% if user %}
             <h3>Transactions</h3>
-            <form method="POST" action="/transactions">
+            <form method="POST" action="/transactions" class="transactionsForm">
                 <div class="form-group">
                     <label for="operation_type" class="form-label">Operation Type</label>
                     <select class="form-control" name="operation_type" id="operationType">
@@ -44,20 +42,17 @@
                 </div>
                 <div class="form-group">
                     <label for="input_description">Beneficiary Name</label>
-                    <input type="text" class="form-control" name="beneficiary_name" id="input_beneficiary_name" placeholder="Enter beneficiary name" required>
+                    <input type="text" class="form-control" name="beneficiary_name" id="input_beneficiary_name" placeholder="Enter beneficiary name">
                 </div>
                 <div class="form-group">
                     <label for="input_amount">Amount</label>
-                    <input type="number" class="form-control" name="amount" id="input_amount" placeholder="Enter amount" min="1" required>
+                    <input type="number" class="form-control" name="amount" id="input_amount" placeholder="Enter amount" min="1">
                 </div>
                 <div class="saveButton">
-                    <a class="saveBtn btn btn-primary"/>Save</a><br />
-                    <span class="successfully-saved">Transaction saved sucessfully</span>
-                </div>      
+                    <button class="saveBtn btn btn-primary" type=submit/>Submit</button><br/>
+                    <span class="successfully-saved">User info updated sucessfully</span>
+                </div>     
             </form>
-            {% else %}
-            <h3>Veuillez vous connecter pour accéder à cette page</h3>
-            {% endif %}
         </div>
     </div>
     <div class="footer">
