@@ -9,29 +9,32 @@ nav {
 .navbar-brand {
     color : white;
     margin-right: 20px;
-    margin-bottom: 5px;
+    font-size: 20px;
 }
 
 .navbar-brand:hover {
-    border-bottom: 2px solid white;
-    color : white;
-    margin-bottom: 5px;
+    color : #E1AD01;
+    font-size: 20px;
 }
 
 .nav-link {
     color : white;
     margin-right: 20px;
-    margin-bottom: 5px;
+    font-size: 20px;
 }
 
 .nav-link:hover {
-    border-bottom: 2px solid white;
-    color : white;
-    margin-bottom: 5px;
+    color : #E1AD01;
+    font-size: 20px;
 }
 
 body {
     background-color: rgb(238, 238, 238);
+}
+
+h4 {
+    text-align: center;
+    margin-top: 100px;
 }
 
 .graph-container {

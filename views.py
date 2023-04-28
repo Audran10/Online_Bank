@@ -91,6 +91,8 @@ def profil():
 
 @app.route('/transactions', methods=['GET', 'POST'])
 def transactions():
+    user = None
+    accounts = None
     if 'user_id' in session:
         conn = sqlite3.connect('app.db')
         user = Users.get_user_by_id(session['user_id'])
@@ -111,3 +113,14 @@ if __name__ == "__main__":
     create_db()
     app.run()
     
+"""   
+@app.route('/')
+def index():
+    user = None
+    accounts = None
+    if 'user_id' in session:
+        user = Users.get_user_by_id(session['user_id'])
+        if user != None:
+            accounts = Accounts.get_accounts_by_user(user.id_user)
+    return render_template('index.html', user=user, accounts=accounts)
+""" 
