@@ -1,19 +1,31 @@
 nav {
-    background-color: white;
+    background-color:#2E835F;
 }
 
 .navbar-nav {
     margin-left: 75%;
+}
 
+.navbar-brand {
+    color : white;
+    margin-right: 20px;
+    font-size: 20px;
+}
+
+.navbar-brand:hover {
+    color : #E1AD01;
+    font-size: 20px;
 }
 
 .nav-link {
-    color: black;
+    color : white;
     margin-right: 20px;
+    font-size: 20px;
 }
 
 .nav-link:hover {
-    color: rgb(102, 204, 153);
+    color : #E1AD01;
+    font-size: 20px;
 }
 
 body {
@@ -21,9 +33,45 @@ body {
     overflow-x: hidden;
 }
 
+h3 {
+    text-align: center;
+    margin-top: 20px;
+}
+
 .footer {
     position: absolute;
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
+}
+
+.transactionsForm {
+    padding: 20px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    background-color: white;
+    margin-top: 20px;
+}
+
+.saveButton {
+    text-align: center;
+}
+
+.saveBtn.btn.btn-primary, .saveBtn.btn.btn-primary:hover  {
+    color : white;
+}
+  
+.successfully-saved {
+    text-align: center;
+    display: none;
+    width: max-content; 
+    margin: 0 auto; 
+    margin-top: 10px;
+    color: #1B7C18;										
+    border-radius: 5px;
+    border: 2px solid #1B7C18;
+    padding: .5em .75em;
+    background: #D6F8DD;
+    width: 25%;
+    margin-top: 20px;
+    position: relative;
 }

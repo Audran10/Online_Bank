@@ -98,15 +98,43 @@ def login():
     return render_template('login.html')
 
 
-@app.route('/profil')
-def profil():
+@app.route('/profile', methods=['GET', 'POST', 'PUT'])
+def profile():
+    user = None
+    accounts = None
     if 'user_id' in session:
         user = Users.get_user_by_id(session['user_id'])
-    return render_template('profil.html', user=user)
+        if user != None:
+            accounts = Accounts.get_accounts_by_user(user.id_user)
+            if request.method == 'POST':
+                conn = sqlite3.connect('app.db')
+                cursor = conn.cursor()
+                if request.form['email'] == "":
+                    email = user.email
+                else:
+                    email = request.form['email']
+                if request.form['phone'] == "":
+                    phone_number = user.phone_number
+                else:
+                    phone_number = request.form['phone']
+                if request.form['address'] == "":
+                    address = user.address
+                else:
+                    address = request.form['address']
+                if request.form['password'] == "":
+                    password = user.password
+                else:
+                    password = request.form['password']
+                cursor = conn.cursor()
+                cursor.execute("UPDATE Users SET email=?, password=?, phone_number=?, address=? WHERE id_user=?", (email, password, phone_number, address, user.id_user))
+                conn.commit()
+    return render_template('profile.html', user=user, accounts=accounts)
 
 
 @app.route('/transactions', methods=['GET', 'POST'])
 def transactions():
+    user = None
+    accounts = None
     if 'user_id' in session:
         conn = sqlite3.connect('app.db')
         user = Users.get_user_by_id(session['user_id'])
@@ -133,8 +161,6 @@ def transactions():
     return render_template('transactions.html', user=user, accounts=accounts)
 
                 
-
 if __name__ == "__main__":
     create_db()
-    app.run()
-    
+    app.run(debug=True)
