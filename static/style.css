@@ -48,6 +48,7 @@ h3 {
 .graph-container {
     width: 20%;
     height: 20%;
+}
 
 /* Cart for solde*/
 .solde {
@@ -89,7 +90,6 @@ h3 {
 /* For h6 and the Transaction content*/
 .col-4 {
     color: rgb(108, 122, 137);
-
 }
 
 /* Footer */

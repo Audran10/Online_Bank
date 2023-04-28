@@ -17,6 +17,7 @@ def index():
     credits = None
     debits = None
     monthly_saving = None
+    transactions = None
     if 'user_id' in session:
         user = Users.get_user_by_id(session['user_id'])
         if user != None:
