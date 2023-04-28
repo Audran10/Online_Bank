@@ -1,3 +1,4 @@
+/* Navbar */
 nav {
     background-color:#2E835F;
 }
@@ -28,9 +29,11 @@ nav {
     font-size: 20px;
 }
 
+
 body {
     background-color: rgb(238, 238, 238);
 }
+
 
 h4 {
     text-align: center;
@@ -45,8 +48,51 @@ h3 {
 .graph-container {
     width: 20%;
     height: 20%;
+
+/* Cart for solde*/
+.solde {
+    color: rgb(108, 122, 137);
+    margin-left: 35%;
+    font-size: 40px;
 }
 
+/* Buttons for Recent Transactions*/
+/* For h5*/
+.card-title {
+    color: rgb(102, 204, 153);
+}
+
+.all-transactions {
+    border: none;
+    margin-right: 8px;
+    margin-left: 20%;
+    border-radius: 10px;
+    background-color: #848ccf;
+    color: #f7f9f7;
+}
+
+.credits {
+    border: none;
+    margin-right: 8px;
+    border-radius: 10px;
+    background-color: rgb(102, 204, 153);
+    color: #f7f9f7;
+}
+
+.debits {
+    border: none;
+    border-radius: 10px;
+    background-color: #ec644b;
+    color: #f7f9f7;
+}
+
+/* For h6 and the Transaction content*/
+.col-4 {
+    color: rgb(108, 122, 137);
+
+}
+
+/* Footer */
 .footer {
     position: absolute;
     bottom: 0;

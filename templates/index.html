@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="../static/style.css">
-    <!-- <script src="../static/graph.js"></script> -->
+
     <title>Document</title>
 </head>
 <body>
@@ -31,30 +31,75 @@
     <div>
         {% if user %}
         Bonjour {{ user.first_name }} {{ user.last_name }}
-        <div class="graph-container">
-            <canvas id="circular-graph"></canvas>
+        <div class="card" style="width: 25rem;">
+            <div class="card-body">
+                <h5 class="card-title">Monthly Income Spent</h5>
+                <canvas id="circular-graph" credits="{{ credits }}" debits="{{ debits }}" ></canvas>
+            </div>
         </div>
-        <script>
-            const circular_graph = document.getElementById('circular-graph').getContext('2d');
-            // let account = '{{ accounts }}';
-            // let total = 0;
 
-            let myChart = new Chart(circular_graph, {
-                type: 'doughnut',
-                data: {
-                    labels: ["Solde"],
-                    datasets: [
-                        {
-                        label: "Solde",
-                        data: [10],
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)'
-                        ],
-                        },
-                    ],
-                },
-            });
-        </script>
+        <div class="card" style="width: 22rem;">
+            <div class="card-body">
+                <h5 class="card-title">Solde
+                    <p class="solde">{{ accounts[0].solde }} €</p>
+                </h5>
+            </div>
+        </div>
+
+        <div class="card" style="width: 33rem;">
+            <div class="card-body">
+                <h5 class="card-title">Recent Transactions
+                    <button class="all-transactions" onclick="showAllTransactions()">All</button>
+                    <button class="credits" onclick="showTransactions('credit')">Credits</button>
+                    <button class="debits" onclick="showTransactions('debit')">Debits</button>
+                </h5>
+                <div class="row justify-content-between">
+                    <div class="col-4">
+                        <p class="text-left" style="padding-left: 10px;">Merchant</p>
+                    </div>
+                    <div class="col-4">
+                        <p class="text-center">Date</p>
+                    </div>
+                    <div class="col-4">
+                        <p class="text-right" style="padding-right: 10px;">Amount</p>
+                    </div>
+                </div>
+                <div id="transactions-container">
+                    {% for transaction in transactions %}
+                    <div class="row justify-content-between transaction">
+                        <div class="col-4">
+                            <p class="text-left" style="padding-left: 10px;">{{ transaction.beneficiary_name }}</p>
+                        </div>
+                        <div class="col-4">
+                            <p class="text-center">{{ transaction.transaction_date }}</p>
+                        </div>
+                        <div class="col-4">
+                            {% if transaction.operation_type == 'debit' %}
+                            <p class="text-right" style="padding-right: 10px;">-{{ transaction.amount }} €</p>
+                            {% else %}
+                            <p class="text-right" style="padding-right: 10px;">{{ transaction.amount }} €</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="width: 22rem;">
+            <div class="card-body">
+                <h5 class="card-title">Monthly Saving
+                    {% if monthly_saving %}
+                    <p class="solde">{{ monthly_saving }} €</p>
+                    {% endif %}
+                    <form method="POST" action="/monthly_saving">
+                        <input type="number" name="saving">
+                        <button type="submit">Save</button>
+                    </form>
+                </h5>
+            </div>
+        </div>
+               
         {% else %}
         <h3>Veuillez vous connecter pour accéder à cette page</h3>
         {% endif %}
@@ -62,5 +107,7 @@
     <div class="footer">
         <p>© 2023 - Online Bank - All rights reserved</p>
     </div>
+    <script src="{{url_for('static', filename='graph.js')}}"></script>
+    
 </body>
 </html>
