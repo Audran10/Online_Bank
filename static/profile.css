@@ -1,0 +1,70 @@
+body {
+    background-color: rgb(238, 238, 238);
+}
+
+.menu {
+    background-color: rgb(102, 204, 153);
+    margin-left: 5%;
+    margin-right: 50%;
+    text-indent: 3%;
+    border-radius: 10px;
+    height: 120px;
+    position: relative;
+}
+
+.name {
+    font-size: 30px;
+    color: white;
+    font-family: 'Roboto', sans-serif;
+    width: 50%;
+    padding-left: 20%;
+    position: absolute;
+    bottom: 0;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+h3 {
+    text-align: center;
+    margin-top: 50px;
+}
+
+h4 {
+    text-align: left;
+    margin-top: 50px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    background-color: white;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+h5 {
+    text-align: left;
+    font-weight: bold;
+    font-size: 20px;
+    margin-bottom: 30px;
+}
+
+.profile_icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    padding: 10px;
+    margin-right: 10px;
+    border: 2px solid black;
+}
+
+.updateInfo {
+    padding: 15px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    background-color: white;
+}
+
+.update_button {
+    text-align: center;
+}

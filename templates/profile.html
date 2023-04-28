@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/transactions.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="../static/profile.css">
+    <title>Profile</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="{{url_for('index')}}">Home</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+              <a class="nav-link" href="{{url_for('transactions')}}">Transactions</a>
+              <a class="nav-link" href="{{url_for('signup')}}">Signup</a>
+              <a class="nav-link" href="{{url_for('login')}}">Login</a>
+              <a class="nav-link" href="{{url_for('profile')}}">Profile</a>
+            </div>
+          </div>
+        </div>
+    </nav>
+    <div>
+        <div class="transactions container mt-4">
+            {% if user %}
+            <h3>Profile</h3>
+            <h4>
+              <img src="{{ url_for('static', filename='profile_icon.svg') }}" alt="SVG Image" class="profile_icon">
+              {{ user.first_name[0] }}. {{ user.last_name }}
+            </h4>
+            <form action="/profile" method="POST" class="updateInfo">
+              <h5>Update your information</h5>
+              <div class="form-group row">
+                  <div class="col">
+                      <label for="email">Email address</label>
+                      <input type="email" class="form-control" name="email" id="email" placeholder="{{ user.email }}">
+                  </div>
+                  <div class="col">
+                      <label for="phone">Phone Number</label>
+                      <input type="tel" class="form-control" name="phone" id="phone" placeholder="{{ user.phone_number }}">
+                  </div>
+              </div>
+              <div class="form-group">
+                  <label for="address">Address</label>
+                  <input type="address" class="form-control" name="address" id="address" placeholder="{{ user.address }}">
+              </div>
+              <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" name="password" id="password" placeholder="***********">
+                    <div class="input-group-append">
+                        <span class="input-group-text toggle-password" id="togglePassword">
+                            <img src="{{ url_for('static', filename='eye-fill.svg') }}" alt="Show Password" id="showPassword">
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <p class="update_button">
+              <button type="submit" class="btn btn-primary">Update</button>
+            </p>
+            <script>
+                const togglePassword = document.querySelector('#togglePassword');
+                const password = document.querySelector('#password');
+                const showPassword = document.querySelector('#showPassword');
+            
+                togglePassword.addEventListener('click', function(e) {
+                    const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                    password.setAttribute('type', type);
+                    showPassword.setAttribute('src', type === 'password' ? '{{ url_for("static", filename="eye-fill.svg") }}' : '{{ url_for("static", filename="eye-slash-fill.svg") }}');
+                    this.classList.toggle('active');
+                    if (type === 'text') {
+                        password.setAttribute('placeholder', '{{ user.password }}');
+                    } else {
+                        password.setAttribute('placeholder', '***********');
+                    }
+                });
+            </script>                        
+            </form> 
+            {% else %}
+            <h3>Veuillez vous connecter pour accéder à cette page</h3>
+            {% endif %}
+        </div>
+    </div>
+    <div class="footer">
+        <p>© 2023 - Online Bank - All rights reserved</p>
+    </div>
+</body>
+</html>
