@@ -129,24 +129,20 @@ class Transactions:
         cursor = conn.cursor()
         month = datetime.datetime.now().month
         year = datetime.datetime.now().year
-        start_date = datetime.datetime(year, month, 1).strftime('%d-%m-%Y')
-        end_date = (datetime.datetime(year, month+1, 1) - datetime.timedelta(days=1)).strftime('%d-%m-%Y')
-        print(start_date)
-        print(end_date)
-        cursor.execute("SELECT SUM(amount) FROM Transactions WHERE id_account = ? AND operation_type = 'credit' AND transaction_date BETWEEN ? AND ?", (id_account, start_date, end_date))
+        month_year_str = datetime.datetime.now().strftime('%m-%Y')
+        cursor.execute("SELECT SUM(amount) FROM Transactions WHERE id_account = ? AND operation_type = 'credit' AND strftime('%m-%Y', transaction_date) = ?", (id_account, month_year_str))
         credit_sum = cursor.fetchone()[0]
-        print(credit_sum)
         conn.close()
         return credit_sum
+
     
     def get_debit_by_account(id_account):
         conn = sqlite3.connect('app.db')
         cursor = conn.cursor()
         month = datetime.datetime.now().month
         year = datetime.datetime.now().year
-        start_date = datetime.datetime(year, month, 1).strftime('%d-%m-%Y')
-        end_date = (datetime.datetime(year, month+1, 1) - datetime.timedelta(days=1)).strftime('%d-%m-%Y')
-        cursor.execute("SELECT SUM(amount) FROM Transactions WHERE id_account = ? AND operation_type = 'debit' AND transaction_date BETWEEN ? AND ?", (id_account, start_date, end_date))
+        month_year_str = datetime.datetime.now().strftime('%m-%Y')
+        cursor.execute("SELECT SUM(amount) FROM Transactions WHERE id_account = ? AND operation_type = 'debit' AND strftime('%m-%Y', transaction_date) = ?", (id_account, month_year_str))
         debit_sum = cursor.fetchone()[0]
         conn.close()
         return debit_sum

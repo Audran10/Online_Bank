@@ -145,7 +145,7 @@ def transactions():
                 beneficiary_name = request.form['beneficiary_name']
                 operation_type = request.form['operation_type']
                 amount = request.form['amount']
-                transaction_date = datetime.date.today().strftime("%d-%m-%Y")
+                transaction_date = datetime.date.today().strftime("%Y-%m-%d")
                 cursor = conn.cursor()
                 if operation_type == "debit" and int(amount) > accounts[0].solde:
                     flash("Solde insuffisant")
