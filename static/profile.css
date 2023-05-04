@@ -41,14 +41,14 @@ h4 {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
     background-color: white;
     padding: 20px;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 h5 {
     text-align: left;
     font-weight: bold;
     font-size: 20px;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 .profile_icon {
@@ -64,8 +64,19 @@ h5 {
     padding: 15px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
     background-color: white;
+    margin-bottom: 30px;
 }
 
-.update_button {
-    text-align: center;
+.accountInfo {
+    padding: 15px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    background-color: white;
+}
+
+#sendEmail {
+    margin-right: 22px;
+}
+
+.accountInfo label {
+    font-weight: bold;
 }

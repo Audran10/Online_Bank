@@ -4,6 +4,7 @@ from models import *
 import sqlite3
 import random
 import datetime
+import smtplib
 
 
 app = Flask(__name__)
@@ -107,6 +108,8 @@ def profile():
         user = Users.get_user_by_id(session['user_id'])
         if user != None:
             accounts = Accounts.get_accounts_by_user(user.id_user)
+            for account in accounts:
+                account.cart_nb = str(account.cart_nb)
             if request.method == 'POST':
                 conn = sqlite3.connect('app.db')
                 cursor = conn.cursor()
