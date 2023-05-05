@@ -19,6 +19,7 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
+              <a class="nav-link" href="{{url_for('create_account')}}">C_Account</a>
               <a class="nav-link" href="{{url_for('transactions')}}">Transactions</a>
               <a class="nav-link" href="{{url_for('signup')}}">Signup</a>
               <a class="nav-link" href="{{url_for('login')}}">Login</a>
@@ -30,23 +31,32 @@
     
     <div>
         {% if user %}
-        Bonjour {{ user.first_name }} {{ user.last_name }}
-        <div class="card" style="width: 25rem;">
+        <div id="accounts" accounts_list="{{ accounts_list }}"></div>
+
+        <div class="username">Hello {{ user.first_name }} {{ user.last_name }}</div>
+
+        <div class="card" style="position: absolute; width: 55rem; margin-left: 50%;">
+            <div class="card-body">
+                <canvas id="line-graph" credits_for_year="{{ credits_for_year|safe }}" debits_for_year="{{ debits_for_year|safe }}"></canvas>
+            </div>
+        </div>
+
+        <div class="card" style="position: absolute; width: 25rem; top: 50%; left: 5%;">
             <div class="card-body">
                 <h5 class="card-title">Monthly Income Spent</h5>
                 <canvas id="circular-graph" credits="{{ credits }}" debits="{{ debits }}" ></canvas>
             </div>
         </div>
 
-        <div class="card" style="width: 22rem;">
+        <div class="card" style="position: absolute; width: 25rem; top: 35.4%; left: 5%;">
             <div class="card-body">
                 <h5 class="card-title">Solde
-                    <p class="solde">{{ accounts[0].solde }} €</p>
+                    <p class="solde" id="show_solde"></p>
                 </h5>
             </div>
         </div>
 
-        <div class="card" style="width: 33rem;">
+        <div class="card" style="position: absolute; width: 33rem; top: 60%; left: 68.4%;">
             <div class="card-body">
                 <h5 class="card-title">Recent Transactions
                     <button class="all-transactions" onclick="showAllTransactions()">All</button>
@@ -65,7 +75,7 @@
                     </div>
                 </div>
                 <div id="transactions-container">
-                    {% for transaction in transactions %}
+                    {% for transaction in transactions[:6] %}
                     <div class="row justify-content-between transaction">
                         <div class="col-4">
                             <p class="text-left" style="padding-left: 10px;">{{ transaction.beneficiary_name }}</p>
@@ -86,12 +96,10 @@
             </div>
         </div>
 
-        <div class="card" style="width: 22rem;">
+        <div class="card" style="position: absolute; width: 22rem; top: 60%; left: 50%;">
             <div class="card-body">
-                <h5 class="card-title">Monthly Saving
-                    {% if monthly_saving %}
-                    <p class="solde">{{ monthly_saving }} €</p>
-                    {% endif %}
+                <h5 class="card-title">Saving
+                    <p class="solde" id="show_monthly_saving"></p>
                     <form method="POST" action="/monthly_saving">
                         <input type="number" name="saving">
                         <button type="submit">Save</button>
