@@ -75,20 +75,16 @@
                     </div>
                 </div>
                 <div id="transactions-container">
-                    {% for transaction in transactions[:6] %}
+                    {% for i in range(1, 7) %}
                     <div class="row justify-content-between transaction">
                         <div class="col-4">
-                            <p class="text-left" style="padding-left: 10px;">{{ transaction.beneficiary_name }}</p>
+                            <p class="text-left" style="padding-left: 10px;"></p>
                         </div>
                         <div class="col-4">
-                            <p class="text-center">{{ transaction.transaction_date }}</p>
+                            <p class="text-center"></p>
                         </div>
                         <div class="col-4">
-                            {% if transaction.operation_type == 'debit' %}
-                            <p class="text-right" style="padding-right: 10px;">-{{ transaction.amount }} €</p>
-                            {% else %}
-                            <p class="text-right" style="padding-right: 10px;">{{ transaction.amount }} €</p>
-                            {% endif %}
+                            <p class="text-right" style="padding-right: 10px;"></p>
                         </div>
                     </div>
                     {% endfor %}

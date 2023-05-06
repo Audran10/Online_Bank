@@ -33,6 +33,18 @@ function toggleButton(button) {
         lineChart.data.datasets[0].data = good_account.credits_for_year;
         lineChart.data.datasets[1].data = good_account.debits_for_year;
         lineChart.update();
+
+        var transactions = document.getElementsByClassName("transaction");
+        for (var i = 0; i < transactions.length; i++) {
+            transactions[i].getElementsByClassName("text-left")[0].innerHTML = good_account.transactions[i][2];
+            transactions[i].getElementsByClassName("text-center")[0].innerHTML = good_account.transactions[i][5];
+            if (good_account.transactions[i][3] == 'debit') {
+                transactions[i].getElementsByClassName("text-right")[0].innerHTML = "-" + good_account.transactions[i][4] + " €";
+            } else {
+                transactions[i].getElementsByClassName("text-right")[0].innerHTML = good_account.transactions[i][4] + " €";
+            }
+        }
+
         button.innerHTML = "X";
     } else {
         button.classList.remove("close-button");

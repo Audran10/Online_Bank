@@ -62,7 +62,7 @@ class Accounts:
         accounts = cursor.fetchall()
         new_accounts = []
         for index, account in enumerate(accounts):
-            cursor.execute('SELECT * FROM Transactions WHERE id_account = ? ORDER BY id_transaction DESC', (account[0],))
+            cursor.execute('SELECT * FROM Transactions WHERE id_account = ? ORDER BY transaction_date DESC', (account[0],))
             transactions = cursor.fetchall()
             monthly_saving = Monthly_saving.get_monthly_saving_by_account_by_user(id_user)[index]
             credits = Transactions.get_credit_by_user(id_user)[index]

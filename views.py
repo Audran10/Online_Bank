@@ -188,6 +188,7 @@ def create_account():
         cursor.execute("UPDATE Accounts SET solde = ? WHERE id_user = ? AND name = ?", (solde_compte_courant, user_id, "Compte courant"))
         conn.commit()
         cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user_id, account_name).id_account, "account opening", "credit", solde, creation_date))
+        cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user_id, "Compte courant").id_account, "account opening", "debit", solde, creation_date))
         conn.commit()
         conn.close()
         return redirect(url_for('index'))
