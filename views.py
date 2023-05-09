@@ -21,12 +21,11 @@ def index():
     transactions = None
     if 'user_id' in session:
         user = Users.get_user_by_id(session['user_id'])
-        if user != None:
-            accounts = Accounts.get_accounts_by_user(user.id_user)
-            credits = Transactions.get_credit_by_account(accounts[0].id_account)
-            debits = Transactions.get_debit_by_account(accounts[0].id_account)
-            transactions = Transactions.get_transactions_by_account(accounts[0].id_account)
-            monthly_saving = Monthly_saving.get_monthly_saving_by_account(accounts[0].id_account)
+        accounts = Accounts.get_accounts_by_user(user.id_user)
+        credits = Transactions.get_credit_by_account(accounts[0].id_account)
+        debits = Transactions.get_debit_by_account(accounts[0].id_account)
+        transactions = Transactions.get_transactions_by_account(accounts[0].id_account)
+        monthly_saving = Monthly_saving.get_monthly_saving_by_account(accounts[0].id_account)
     return render_template('index.html', user=user, accounts=accounts, credits=credits, debits=debits, transactions=transactions, monthly_saving=monthly_saving)
 
 
@@ -37,7 +36,6 @@ def monthly_saving():
     date = datetime.datetime.now().strftime("%Y-%m-%d")
     Monthly_saving.add_monthly_saving(accounts[0].id_account, saving, date)
     return redirect(url_for('index'))
-
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -65,8 +63,8 @@ def signup():
             if password != correct_password:
                 flash("Les mots de passe ne correspondent pas")
             else:
-                #hashed_password = hashlib.sha256(password.encode()).hexdigest()
-                cursor.execute("INSERT INTO Users (first_name, last_name, gender, email, password, phone_number, birthday, address, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (first_name, last_name, gender, email, password, phone_number, birthday, address, role))
+                hashed_password = hashlib.sha256(password.encode()).hexdigest()
+                cursor.execute("INSERT INTO Users (first_name, last_name, gender, email, password, phone_number, birthday, address, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (first_name, last_name, gender, email, hashed_password, phone_number, birthday, address, role))
                 conn.commit()
                 user = Users.get_user_by_email(email, password)
                 session['user_id'] = user.id_user
@@ -81,7 +79,7 @@ def signup():
                 cursor.execute("INSERT INTO Accounts (id_user, cart_nb, name, solde, creation_date) VALUES (?, ?, ?, ?, ?)", (user.id_user, new_cart_nb, "Compte courant", 50, current_date))
                 conn.commit()
                 conn.close()
-                return redirect(url_for('index'))
+                return redirect(url_for('login'))
 
     return render_template('signup.html')
 
@@ -91,10 +89,11 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-        user = Users.get_user_by_email(email, password)
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        user = Users.get_user_by_email(email, hashed_password)
         if user != None:
             session['user_id'] = user.id_user
-            return redirect(url_for('index'))
+            return redirect(url_for('transactions'))
         else:
             flash("Email ou mot de passe incorrect")
     return render_template('login.html')
@@ -128,7 +127,7 @@ def profile():
                 if request.form['password'] == "":
                     password = user.password
                 else:
-                    password = request.form['password']
+                    password = hashlib.sha256(request.form['password'].encode()).hexdigest()
                 cursor = conn.cursor()
                 cursor.execute("UPDATE Users SET email=?, password=?, phone_number=?, address=? WHERE id_user=?", (email, password, phone_number, address, user.id_user))
                 conn.commit()
