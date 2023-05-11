@@ -4,7 +4,7 @@ nav {
 }
 
 .navbar-nav {
-    margin-left: 75%;
+    margin-left: 70%;
 }
 
 .navbar-brand {
@@ -32,6 +32,28 @@ nav {
 
 body {
     background-color: rgb(238, 238, 238);
+}
+
+.close-button {
+    position: absolute;
+    font-size: 1.5rem;
+    color: rgb(102, 204, 153);
+    margin-left: 90%;
+    border: none;
+}
+
+.close-button:focus {
+    outline: none;
+}
+
+.card {
+    display: none;
+}
+
+.username {
+    color: rgb(102, 204, 153);
+    font-weight: bold;
+    font-size: 30px;
 }
 
 

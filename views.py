@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, flash, session, redirect, url_for
+from flask import Flask, render_template, request, flash, session, redirect, url_for, jsonify
+import json
 import hashlib
 from models import *
 import sqlite3
@@ -18,15 +19,25 @@ def index():
     debits = None
     monthly_saving = None
     transactions = None
+    credits_for_year = None
+    debits_for_year = None
+    accounts_list = None
     if 'user_id' in session:
         user = Users.get_user_by_id(session['user_id'])
         if user != None:
             accounts = Accounts.get_accounts_by_user(user.id_user)
-            credits = Transactions.get_credit_by_account(accounts[0].id_account)
-            debits = Transactions.get_debit_by_account(accounts[0].id_account)
-            transactions = Transactions.get_transactions_by_account(accounts[0].id_account)
-            monthly_saving = Monthly_saving.get_monthly_saving_by_account(accounts[0].id_account)
-    return render_template('index.html', user=user, accounts=accounts, credits=credits, debits=debits, transactions=transactions, monthly_saving=monthly_saving)
+            accounts_list = json.dumps([account.__dict__ for account in accounts])
+            credits = Transactions.get_credit_by_user(user.id_user)
+            debits = Transactions.get_debit_by_user(user.id_user)
+            transactions = Transactions.get_transactions_by_user(user.id_user)
+            monthly_saving = Monthly_saving.get_monthly_saving_by_account_by_user(user.id_user)
+            credits_for_year = json.dumps(Transactions.get_credit_by_mounth(user.id_user))
+            debits_for_year = json.dumps(Transactions.get_debit_by_mounth(user.id_user))
+            print(accounts_list)
+    return render_template('index.html', user=user, accounts=accounts, 
+                           credits=credits, debits=debits, transactions=transactions, 
+                           monthly_saving=monthly_saving, credits_for_year=credits_for_year,
+                           debits_for_year=debits_for_year, accounts_list=accounts_list)
 
 
 @app.route('/monthly_saving', methods=['GET', 'POST'])
@@ -76,7 +87,7 @@ def signup():
                     new_cart_nb += 1
                     cursor.execute("SELECT * FROM Accounts WHERE cart_nb = ?", (new_cart_nb,))
                     existing_cart_nb = cursor.fetchone()
-                current_date = datetime.date.today().strftime("%d-%m-%Y")
+                current_date = datetime.date.today().strftime("%Y-%m-%d")
                 cursor.execute("INSERT INTO Accounts (id_user, cart_nb, name, solde, creation_date) VALUES (?, ?, ?, ?, ?)", (user.id_user, new_cart_nb, "Compte courant", 50, current_date))
                 conn.commit()
                 conn.close()
@@ -160,6 +171,28 @@ def transactions():
                         conn.commit()
                     
     return render_template('transactions.html', user=user, accounts=accounts)
+
+
+@app.route('/create_account', methods=['GET', 'POST'])
+def create_account():
+    if request.method == 'POST':
+        account_name = request.form['account_name']
+        user_id = session['user_id']
+        solde = 50
+        solde_compte_courant = Accounts.get_account_by_user_and_name(user_id, "Compte courant").solde - solde
+        creation_date = datetime.date.today().strftime("%Y-%m-%d")
+        new_card_nb = random.randint(10**15, 10**16-1)
+        conn = sqlite3.connect('app.db')
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO Accounts (id_user, cart_nb, name, solde, creation_date) VALUES (?, ?, ?, ?, ?)", (user_id, new_card_nb, account_name, solde, creation_date))
+        cursor.execute("UPDATE Accounts SET solde = ? WHERE id_user = ? AND name = ?", (solde_compte_courant, user_id, "Compte courant"))
+        conn.commit()
+        cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user_id, account_name).id_account, "account opening", "credit", solde, creation_date))
+        cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user_id, "Compte courant").id_account, "account opening", "debit", solde, creation_date))
+        conn.commit()
+        conn.close()
+        return redirect(url_for('index'))
+    return render_template('create_account.html')
 
                 
 if __name__ == "__main__":
