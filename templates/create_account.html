@@ -31,6 +31,7 @@
         </div>
     </nav>
     <div>
+        {% if user %}
         <div class="transactions container mt-4">
             <h3>Create a new account</h3>
             <form method="POST" action="/create_account" class="newAccountForm">
@@ -51,6 +52,9 @@
                 </div>                        
             </form>
         </div>
+        {% else %}
+        <h3>Veuillez vous connecter pour accéder à cette page</h3>
+        {% endif %}
     </div>
 </body>
 </html>

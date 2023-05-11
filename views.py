@@ -188,16 +188,17 @@ def transactions():
                         conn.commit()
                     else:
                         cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (accounts[0].solde - int(amount), accounts[0].id_account))
-                        conn.commit()
-                    
+                        conn.commit()   
     return render_template('transactions.html', user=user, accounts=accounts)
 
 
 @app.route('/create_account', methods=['GET', 'POST'])
 def create_account():
-    user = Users.get_user_by_id(session['user_id'])
-    accounts = Accounts.get_accounts_by_user(user.id_user)
+    user = None 
+    accounts = None
     if request.method == 'POST':
+        user = Users.get_user_by_id(session['user_id'])
+        accounts = Accounts.get_accounts_by_user(user.id_user)
         name = request.form['name']
         user_id = session['user_id']
         creation_date = datetime.date.today().strftime("%Y-%m-%d")
@@ -209,9 +210,6 @@ def create_account():
         else : 
             solde = solde
         if solde_compte_courant < int(solde):
-        ##########################
-            #print("Solde insuffisant")
-        ################################
             flash("Solde insuffisant")
         elif name == "livret_a" and Accounts.get_account_by_user_and_name(user_id, "livret_a") != None:
             flash("You cannot create more than one Livret A")

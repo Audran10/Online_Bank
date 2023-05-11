@@ -31,6 +31,7 @@
         </div>
     </nav>
     <div>
+      {% if user %}
         <div class="transactions container mt-4">
             <h3>Profile</h3>
             <h4>
@@ -86,9 +87,6 @@
                 });
             </script>                        
             </form> 
-            <form action="/delete_account" method="POST">
-              <button type="submit" class="deleteBtn btn btn-danger">Delete Account</button>
-            </form>       
             <form class="accountInfo" method="GET, POST">
                 <h5>Account information</h5>
                 <div class="row">
@@ -123,7 +121,13 @@
                 <hr>
                 {% endfor %}
               </form>
+              <form action="/delete_account" method="POST" class="deleteAccount">
+                <button type="submit" class="deleteBtn btn btn-danger">Delete Account</button>
+              </form>       
         </div>
+      {% else %}
+      <h3>Veuillez vous connecter pour accéder à cette page</h3>
+      {% endif %}
     </div>
 </body>
 </html>
