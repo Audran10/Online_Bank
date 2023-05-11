@@ -36,8 +36,8 @@ class Users:
             return new_user
         else:
             return None
-
-
+        
+        
 class Accounts:
     def __init__(self, id_account, id_user, cart_nb, name, solde, creation_date, end_date, transactions):
         self.id_account = id_account
@@ -78,6 +78,7 @@ class Accounts:
             return new_account
         else:
             return None
+
 
 class Monthly_saving:
     def __init__(self, id_monthly_saving, id_account, amount, date):
@@ -226,7 +227,7 @@ def create_db():
         CREATE TABLE IF NOT EXISTS Accounts (
             id_account INTEGER PRIMARY KEY AUTOINCREMENT,
             id_user INTEGER NOT NULL,
-            cart_nb INTEGER NOT NULL,
+            cart_nb INTEGER,
             name TEXT NOT NULL,
             solde INTEGER NOT NULL,
             creation_date DATE NOT NULL,

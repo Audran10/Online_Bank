@@ -21,10 +21,9 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
+              <a class="nav-link" href="{{url_for('create_account')}}">New Account</a>
               <a class="nav-link" href="{{url_for('transactions')}}">Transactions</a>
-              <a class="nav-link" href="{{url_for('signup')}}">Signup</a>
-              <a class="nav-link" href="{{url_for('login')}}">Login</a>
-              <a class="nav-link" href="{{url_for('profile')}}">Profile</a>
+              <a class="nav-link" href="{{url_for('profile')}}">Profil</a>
             </div>
           </div>
         </div>
@@ -35,6 +34,9 @@
             <h4>
               <img src="{{ url_for('static', filename='profile_icon.svg') }}" alt="SVG Image" class="profile_icon">
               {{ user.first_name[0] }}. {{ user.last_name.capitalize() }}
+              <a href="{{url_for('logout')}}">
+                <button class="deleteBtn btn btn-danger" id="logout" type=submit/>Logout</button>
+              </a>
             </h4>
             <form action="/profile" method="POST" class="updateInfo">
               <h5>Your information</h5>
@@ -66,10 +68,7 @@
             <div class="saveButton">
                 <button class="saveBtn btn btn-primary" type=submit/>Update</button><br/>
                 <span class="successfully-saved">User info updated sucessfully</span>
-            </div>     
-            <div class="deleteButton">
-                <button class="deleteBtn btn btn-danger" type=submit/>Delete</button><br/>
-            </div>
+            </div>        
             <script>
                 const togglePassword = document.querySelector('#togglePassword');
                 const password = document.querySelector('#password');
@@ -122,6 +121,9 @@
                 <hr>
                 {% endfor %}
               </form>
+              <form action="/delete_account" method="POST" class="deleteAccount">
+                <button type="submit" class="deleteBtn btn btn-danger">Delete Account</button>
+              </form>       
         </div>
     </div>
 </body>
