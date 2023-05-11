@@ -36,17 +36,25 @@ class Users:
             return new_user
         else:
             return None
+    
+    def delete_user(id_user):
+        print("Deleting user with id")
+        print(id_user)
+        conn = sqlite3.connect('app.db')
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM Users WHERE id_user = ?', (id_user,))
+        conn.commit()
+        conn.close()
 
 
 class Accounts:
-    def __init__(self, id_account, id_user, cart_nb, name, solde, creation_date, end_date):
+    def __init__(self, id_account, id_user, cart_nb, name, solde, creation_date):
         self.id_account = id_account
         self.id_user = id_user
         self.cart_nb = cart_nb
         self.name = name
         self.solde = solde
         self.creation_date = creation_date
-        self.end_date = end_date
     
     def get_accounts_by_user(id_user):
         conn = sqlite3.connect('app.db')
@@ -101,7 +109,7 @@ class Monthly_saving:
         conn.close()
 
 class Loans:
-    def __init__(self, id_loan, id_account, duration, loan_amount, interest, amount_reimbursed, monthly_payment, start_date, end_date, status):
+    def __init__(self, id_loan, id_account, duration, loan_amount, interest, amount_reimbursed, monthly_payment, start_date, status):
         self.id_loan = id_loan
         self.id_account = id_account
         self.duration = duration
@@ -110,7 +118,6 @@ class Loans:
         self.amount_reimbursed = amount_reimbursed
         self.monthly_payment = monthly_payment
         self.start_date = start_date
-        self.end_date = end_date
         self.status = status
 
 
@@ -185,11 +192,10 @@ def create_db():
         CREATE TABLE IF NOT EXISTS Accounts (
             id_account INTEGER PRIMARY KEY AUTOINCREMENT,
             id_user INTEGER NOT NULL,
-            cart_nb INTEGER NOT NULL,
+            cart_nb INTEGER,
             name TEXT NOT NULL,
             solde INTEGER NOT NULL,
             creation_date DATE NOT NULL,
-            end_date DATE,
             FOREIGN KEY (id_user) REFERENCES Users(id_user)
         );
     ''')
@@ -214,7 +220,6 @@ def create_db():
             amount_reimbursed INTEGER NOT NULL,
             monthly_payment INTEGER NOT NULL,
             start_date DATE NOT NULL,
-            end_date DATE NOT NULL,
             status TEXT NOT NULL,
             FOREIGN KEY (id_account) REFERENCES Account(id_account)
         );

@@ -67,11 +67,14 @@
                 <button class="saveBtn btn btn-primary" type=submit/>Update</button><br/>
                 <span class="successfully-saved">User info updated sucessfully</span>
             </div>     
+            <div class="deleteButton">
+                <button class="deleteBtn btn btn-danger" type=submit/>Delete</button><br/>
+            </div>
             <script>
                 const togglePassword = document.querySelector('#togglePassword');
                 const password = document.querySelector('#password');
                 const showPassword = document.querySelector('#showPassword');
-            
+              
                 togglePassword.addEventListener('click', function(e) {
                     const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
                     password.setAttribute('type', type);

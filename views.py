@@ -66,7 +66,7 @@ def signup():
                 hashed_password = hashlib.sha256(password.encode()).hexdigest()
                 cursor.execute("INSERT INTO Users (first_name, last_name, gender, email, password, phone_number, birthday, address, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (first_name, last_name, gender, email, hashed_password, phone_number, birthday, address, role))
                 conn.commit()
-                user = Users.get_user_by_email(email, password)
+                user = Users.get_user_by_email(email, hashed_password)
                 session['user_id'] = user.id_user
                 new_cart_nb = random.randint(10**15, 10**16-1)
                 cursor.execute("SELECT * FROM Accounts WHERE cart_nb = ?", (new_cart_nb,))
@@ -93,7 +93,7 @@ def login():
         user = Users.get_user_by_email(email, hashed_password)
         if user != None:
             session['user_id'] = user.id_user
-            return redirect(url_for('transactions'))
+            return redirect(url_for('index'))
         else:
             flash("Email ou mot de passe incorrect")
     return render_template('login.html')
@@ -134,6 +134,19 @@ def profile():
     return render_template('profile.html', user=user, accounts=accounts)
 
 
+@app.route('/profile', methods=['DELETE'])
+def delete_account():
+    print("delete")
+    user_id = session.get('user_id')
+    user = Users.get_user_by_id(user_id)
+    if user:
+        Users.delete_user(user_id)
+        session.pop('user_id')
+        print("Account has been deleted")
+        return redirect(url_for('login'))
+    return redirect(url_for('profile'))
+
+
 @app.route('/transactions', methods=['GET', 'POST'])
 def transactions():
     user = None
@@ -162,6 +175,42 @@ def transactions():
                         conn.commit()
                     
     return render_template('transactions.html', user=user, accounts=accounts)
+
+
+@app.route('/accounts', methods=['GET', 'POST']) #add flash for minimum 50
+def accounts():
+    user = None
+    accounts = None
+    if 'user_id' in session:
+        conn = sqlite3.connect('app.db')
+        user = Users.get_user_by_id(session['user_id'])
+        if user != None:
+            accounts = Accounts.get_accounts_by_user(user.id_user)
+            if request.method == 'POST':
+                name = request.form['name']
+                creation_date = datetime.date.today().strftime("%Y-%m-%d")
+                solde = request.form['solde']
+                if name == "Compte Courrant" : 
+                    cart_nb = random.randint(10**15, 10**16-1)
+                else : 
+                    cart_nb = None 
+                if solde <= 50 : 
+                    solde = 50 
+                else : 
+                    solde = solde
+                cursor = conn.cursor()
+                    
+                    
+    """cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (accounts[0].id_account, beneficiary_name, operation_type, amount, transaction_date))
+                    conn.commit()
+                    if operation_type == "credit":
+                        cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (accounts[0].solde + int(amount), accounts[0].id_account))
+                        conn.commit()
+                    else:
+                        cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (accounts[0].solde - int(amount), accounts[0].id_account))
+                        conn.commit()""" 
+                    
+    return render_template('accounts.html', user=user, accounts=accounts)
 
                 
 if __name__ == "__main__":
