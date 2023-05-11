@@ -33,8 +33,7 @@ body {
 
 h3 {
     text-align: center;
-    margin-top: 20px;
-    font-size: 30px;
+    margin-top: 50px;
 }
 
 h4 {
@@ -81,4 +80,15 @@ h5 {
 
 .accountInfo label {
     font-weight: bold;
+}
+
+.deleteAccount {
+    margin-top: 2%;
+    text-align: center;
+}
+
+#logout {
+    position: absolute;
+    top: 7%;
+    right: 2%; 
 }
