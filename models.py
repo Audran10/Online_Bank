@@ -36,8 +36,8 @@ class Users:
             return new_user
         else:
             return None
-
-
+        
+        
 class Accounts:
     def __init__(self, id_account, id_user, cart_nb, name, solde, creation_date, end_date, transactions, monthly_saving, credits, debits, credits_for_year, debits_for_year):
         self.id_account = id_account
@@ -89,6 +89,7 @@ class Accounts:
             return new_account
         else:
             return None
+
 
 class Monthly_saving:
     def __init__(self, id_monthly_saving, id_account, amount, date):
@@ -158,8 +159,6 @@ class Transactions:
         return list_credit_accounts
 
 
-
-    
     def get_debit_by_user(id_user):
         list_debit_accounts = []
         conn = sqlite3.connect('app.db')

@@ -67,10 +67,7 @@
             <div class="saveButton">
                 <button class="saveBtn btn btn-primary" type=submit/>Update</button><br/>
                 <span class="successfully-saved">User info updated sucessfully</span>
-            </div>     
-            <div class="deleteButton">
-                <button class="deleteBtn btn btn-danger" type=submit/>Delete</button><br/>
-            </div>
+            </div>        
             <script>
                 const togglePassword = document.querySelector('#togglePassword');
                 const password = document.querySelector('#password');
@@ -89,6 +86,9 @@
                 });
             </script>                        
             </form> 
+            <form action="/delete_account" method="POST">
+              <button type="submit" class="deleteBtn btn btn-danger">Delete Account</button>
+            </form>       
             <form class="accountInfo" method="GET, POST">
                 <h5>Account information</h5>
                 <div class="row">

@@ -33,7 +33,7 @@ def index():
             monthly_saving = Monthly_saving.get_monthly_saving_by_account_by_user(user.id_user)
             credits_for_year = json.dumps(Transactions.get_credit_by_mounth(user.id_user))
             debits_for_year = json.dumps(Transactions.get_debit_by_mounth(user.id_user))
-            print(accounts_list)
+            #print(accounts_list)
     return render_template('index.html', user=user, accounts=accounts, 
                            credits=credits, debits=debits, transactions=transactions, 
                            monthly_saving=monthly_saving, credits_for_year=credits_for_year,
@@ -142,6 +142,27 @@ def profile():
     return render_template('profile.html', user=user, accounts=accounts)
 
 
+@app.route('/delete_account', methods=['DELETE', 'POST'])
+def delete_account():
+    if request.method == 'POST':
+        conn = sqlite3.connect('app.db')
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM Transactions WHERE id_account IN (SELECT id_account FROM Accounts WHERE id_user=?)", (session['user_id'],))
+        conn.commit()
+        cursor.execute("DELETE FROM Monthly_saving WHERE id_account IN (SELECT id_account FROM Accounts WHERE id_user=?)", (session['user_id'],))
+        conn.commit()
+        cursor.execute("DELETE FROM Loans WHERE id_account IN (SELECT id_account FROM Accounts WHERE id_user=?)", (session['user_id'],))
+        conn.commit()
+        cursor.execute("DELETE FROM Users WHERE id_user=?", (session['user_id'],))
+        conn.commit()
+        cursor.execute("DELETE FROM Accounts WHERE id_user=?", (session['user_id'],))
+        conn.commit()
+        session.pop('user_id', None)
+        conn.close()
+        return redirect(url_for('index'))
+    return render_template('profile.html')
+
+
 @app.route('/transactions', methods=['GET', 'POST'])
 def transactions():
     user = None
@@ -188,6 +209,9 @@ def create_account():
         else : 
             solde = solde
         if solde_compte_courant < int(solde):
+        ##########################
+            #print("Solde insuffisant")
+        ################################
             flash("Solde insuffisant")
         elif name == "livret_a" and Accounts.get_account_by_user_and_name(user_id, "livret_a") != None:
             flash("You cannot create more than one Livret A")
@@ -204,7 +228,8 @@ def create_account():
             cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user_id, "Compte courant").id_account, "account opening", "debit", solde, creation_date))
             conn.commit()
             conn.close()
-        return redirect(url_for('index'))
+            flash("New account created successfully")
+            return redirect(url_for('index'))
     return render_template('create_account.html', user=user, accounts=accounts)
 
                 
