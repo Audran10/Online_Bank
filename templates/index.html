@@ -19,16 +19,15 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-              <a class="nav-link" href="{{url_for('create_account')}}">C_Account</a>
-              <a class="nav-link" href="{{url_for('transactions')}}">Transactions</a>
-              <a class="nav-link" href="{{url_for('signup')}}">Signup</a>
-              <a class="nav-link" href="{{url_for('login')}}">Login</a>
-              <a class="nav-link" href="{{url_for('profile')}}">Profile</a>
+                <a class="nav-link" href="{{url_for('create_account')}}">New Account</a>
+                <a class="nav-link" href="{{url_for('transactions')}}">Transactions</a>
+                <a class="nav-link" href="{{url_for('signup')}}">Signup</a>
+                <a class="nav-link" href="{{url_for('login')}}">Login</a>
+                <a class="nav-link" href="{{url_for('profile')}}">Profil</a>
             </div>
           </div>
         </div>
     </nav>
-    
     <div>
         {% if user %}
         <div id="accounts" accounts_list="{{ accounts_list }}"></div>
@@ -112,6 +111,5 @@
         <p>© 2023 - Online Bank - All rights reserved</p>
     </div>
     <script src="{{url_for('static', filename='graph.js')}}"></script>
-    
 </body>
 </html>

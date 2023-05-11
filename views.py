@@ -174,24 +174,38 @@ def transactions():
 
 @app.route('/create_account', methods=['GET', 'POST'])
 def create_account():
+    user = Users.get_user_by_id(session['user_id'])
+    accounts = Accounts.get_accounts_by_user(user.id_user)
     if request.method == 'POST':
-        account_name = request.form['account_name']
+        name = request.form['name']
         user_id = session['user_id']
-        solde = 50
-        solde_compte_courant = Accounts.get_account_by_user_and_name(user_id, "Compte courant").solde - solde
         creation_date = datetime.date.today().strftime("%Y-%m-%d")
-        new_card_nb = random.randint(10**15, 10**16-1)
-        conn = sqlite3.connect('app.db')
-        cursor = conn.cursor()
-        cursor.execute("INSERT INTO Accounts (id_user, cart_nb, name, solde, creation_date) VALUES (?, ?, ?, ?, ?)", (user_id, new_card_nb, account_name, solde, creation_date))
-        cursor.execute("UPDATE Accounts SET solde = ? WHERE id_user = ? AND name = ?", (solde_compte_courant, user_id, "Compte courant"))
-        conn.commit()
-        cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user_id, account_name).id_account, "account opening", "credit", solde, creation_date))
-        cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user_id, "Compte courant").id_account, "account opening", "debit", solde, creation_date))
-        conn.commit()
-        conn.close()
+        cart_nb = None
+        solde_compte_courant = Accounts.get_account_by_user_and_name(user_id, "Compte courant").solde 
+        solde = request.form['solde']
+        if int(solde) <= 50:
+            solde = 50 
+        else : 
+            solde = solde
+        if solde_compte_courant < int(solde):
+            flash("Solde insuffisant")
+        elif name == "livret_a" and Accounts.get_account_by_user_and_name(user_id, "livret_a") != None:
+            flash("You cannot create more than one Livret A")
+        elif name == "livret_dds" and Accounts.get_account_by_user_and_name(user_id, "livret_dds") != None:
+            flash("You cannot create more than one Livret A")
+        else:
+            new_solde_compte_courant = Accounts.get_account_by_user_and_name(user_id, "Compte courant").solde - int(solde) 
+            conn = sqlite3.connect('app.db')
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO Accounts (id_user, cart_nb, name, solde, creation_date) VALUES (?, ?, ?, ?, ?)", (user_id, cart_nb, name, solde, creation_date))
+            cursor.execute("UPDATE Accounts SET solde = ? WHERE id_user = ? AND name = ?", (new_solde_compte_courant, user_id, "Compte courant"))
+            conn.commit()
+            cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user_id, name).id_account, "account opening", "credit", solde, creation_date))
+            cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user_id, "Compte courant").id_account, "account opening", "debit", solde, creation_date))
+            conn.commit()
+            conn.close()
         return redirect(url_for('index'))
-    return render_template('create_account.html')
+    return render_template('create_account.html', user=user, accounts=accounts)
 
                 
 if __name__ == "__main__":

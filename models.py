@@ -254,7 +254,7 @@ def create_db():
         CREATE TABLE IF NOT EXISTS Accounts (
             id_account INTEGER PRIMARY KEY AUTOINCREMENT,
             id_user INTEGER NOT NULL,
-            cart_nb INTEGER NOT NULL,
+            cart_nb INTEGER,
             name TEXT NOT NULL,
             solde INTEGER NOT NULL,
             creation_date DATE NOT NULL,
