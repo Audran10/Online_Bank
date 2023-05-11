@@ -49,13 +49,11 @@ def monthly_saving():
     return redirect(url_for('index'))
 
 
-
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
         conn = sqlite3.connect('app.db')
         cursor = conn.cursor()
-
         first_name = request.form['firstname']
         last_name = request.form['lastname']
         gender = request.form['gender']
@@ -66,7 +64,6 @@ def signup():
         birthday = request.form['birthday']
         address = request.form['address']
         role = "user"
-
         cursor.execute("SELECT * FROM Users WHERE email = ?", (email,))
         existing_user = cursor.fetchone()
         if existing_user != None:
@@ -75,10 +72,10 @@ def signup():
             if password != correct_password:
                 flash("Les mots de passe ne correspondent pas")
             else:
-                #hashed_password = hashlib.sha256(password.encode()).hexdigest()
-                cursor.execute("INSERT INTO Users (first_name, last_name, gender, email, password, phone_number, birthday, address, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (first_name, last_name, gender, email, password, phone_number, birthday, address, role))
+                hashed_password = hashlib.sha256(password.encode()).hexdigest()
+                cursor.execute("INSERT INTO Users (first_name, last_name, gender, email, password, phone_number, birthday, address, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (first_name, last_name, gender, email, hashed_password, phone_number, birthday, address, role))
                 conn.commit()
-                user = Users.get_user_by_email(email, password)
+                user = Users.get_user_by_email(email, hashed_password)
                 session['user_id'] = user.id_user
                 new_cart_nb = random.randint(10**15, 10**16-1)
                 cursor.execute("SELECT * FROM Accounts WHERE cart_nb = ?", (new_cart_nb,))
@@ -87,12 +84,11 @@ def signup():
                     new_cart_nb += 1
                     cursor.execute("SELECT * FROM Accounts WHERE cart_nb = ?", (new_cart_nb,))
                     existing_cart_nb = cursor.fetchone()
-                current_date = datetime.date.today().strftime("%Y-%m-%d")
+                current_date = datetime.date.today().strftime("%d-%m-%Y")
                 cursor.execute("INSERT INTO Accounts (id_user, cart_nb, name, solde, creation_date) VALUES (?, ?, ?, ?, ?)", (user.id_user, new_cart_nb, "Compte courant", 50, current_date))
                 conn.commit()
                 conn.close()
-                return redirect(url_for('index'))
-
+                return redirect(url_for('login'))
     return render_template('signup.html')
 
 
@@ -101,7 +97,8 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-        user = Users.get_user_by_email(email, password)
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+        user = Users.get_user_by_email(email, hashed_password)
         if user != None:
             session['user_id'] = user.id_user
             return redirect(url_for('index'))
@@ -118,6 +115,8 @@ def profile():
         user = Users.get_user_by_id(session['user_id'])
         if user != None:
             accounts = Accounts.get_accounts_by_user(user.id_user)
+            for account in accounts:
+                account.cart_nb = str(account.cart_nb)
             if request.method == 'POST':
                 conn = sqlite3.connect('app.db')
                 cursor = conn.cursor()
@@ -136,7 +135,7 @@ def profile():
                 if request.form['password'] == "":
                     password = user.password
                 else:
-                    password = request.form['password']
+                    password = hashlib.sha256(request.form['password'].encode()).hexdigest()
                 cursor = conn.cursor()
                 cursor.execute("UPDATE Users SET email=?, password=?, phone_number=?, address=? WHERE id_user=?", (email, password, phone_number, address, user.id_user))
                 conn.commit()

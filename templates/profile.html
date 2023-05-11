@@ -34,10 +34,10 @@
             <h3>Profile</h3>
             <h4>
               <img src="{{ url_for('static', filename='profile_icon.svg') }}" alt="SVG Image" class="profile_icon">
-              {{ user.first_name[0] }}. {{ user.last_name }}
+              {{ user.first_name[0] }}. {{ user.last_name.capitalize() }}
             </h4>
             <form action="/profile" method="POST" class="updateInfo">
-              <h5>Update your information</h5>
+              <h5>Your information</h5>
               <div class="form-group row">
                   <div class="col">
                       <label for="email">Email address</label>
@@ -55,7 +55,7 @@
               <div class="form-group">
                 <label for="password">Password</label>
                 <div class="input-group">
-                    <input type="password" class="form-control" name="password" id="password" placeholder="***********">
+                    <input type="password" class="form-control" name="password" id="password" placeholder="***********" autocomplete="off">
                     <div class="input-group-append">
                         <span class="input-group-text toggle-password" id="togglePassword">
                             <img src="{{ url_for('static', filename='eye-fill.svg') }}" alt="Show Password" id="showPassword">
@@ -67,11 +67,14 @@
                 <button class="saveBtn btn btn-primary" type=submit/>Update</button><br/>
                 <span class="successfully-saved">User info updated sucessfully</span>
             </div>     
+            <div class="deleteButton">
+                <button class="deleteBtn btn btn-danger" type=submit/>Delete</button><br/>
+            </div>
             <script>
                 const togglePassword = document.querySelector('#togglePassword');
                 const password = document.querySelector('#password');
                 const showPassword = document.querySelector('#showPassword');
-            
+              
                 togglePassword.addEventListener('click', function(e) {
                     const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
                     password.setAttribute('type', type);
@@ -85,34 +88,40 @@
                 });
             </script>                        
             </form> 
-            <!--<form class="updateInfo">
+            <form class="accountInfo" method="GET, POST">
                 <h5>Account information</h5>
-                <div class="form-group row">
-                    <div class="col">
-                        <label for="email">Email address</label>
-                        <input type="email" class="form-control" name="email" id="email" placeholder="{{ user.email }}">
-                    </div>
-                    <div class="col">
-                        <label for="phone">Phone Number</label>
-                        <input type="tel" class="form-control" name="phone" id="phone" placeholder="{{ user.phone_number }}">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="address">Address</label>
-                    <input type="address" class="form-control" name="address" id="address" placeholder="{{ user.address }}">
-                </div>
-                <div class="form-group">
-                  <label for="password">Password</label>
-                  <div class="input-group">
-                      <input type="password" class="form-control" name="password" id="password" placeholder="***********">
-                      <div class="input-group-append">
-                          <span class="input-group-text toggle-password" id="togglePassword">
-                              <img src="{{ url_for('static', filename='eye-fill.svg') }}" alt="Show Password" id="showPassword">
-                          </span>
-                      </div>
+                <div class="row">
+                  <div class="col">
+                    <label for="name">Account Type</label>
                   </div>
-              </div>                 
-              </form> -->
+                  <div class="col">
+                    <label for="cart_nb">Card Number</label>
+                  </div>
+                  <div class="col">
+                    <label for="creation_date">Creation Date</label>
+                  </div>
+                  <div class="col text-right">
+                    <label for="creation_date">Forgot Card Number?</label>
+                  </div>
+                </div> 
+                {% for account in accounts %}
+                <div class="row">
+                  <div class="col">
+                    <input type="text" class="form-control" name="name" id="name" placeholder="{{ account.name }}" readonly>
+                  </div>
+                  <div class="col">
+                    <input type="text" class="form-control" name="cart_nb" id="cart_nb" placeholder="XXXX-XXXX-XXXX-{{ account.cart_nb[-4:] }}" readonly>
+                  </div>
+                  <div class="col">
+                    <input type="text" class="form-control" name="creation_date" id="creation_date" placeholder="{{ account.creation_date }}" readonly>
+                  </div>
+                  <div class="col text-right">
+                    <button class="saveBtn btn btn-primary" id="sendEmail" type=submit/>Send email</button>
+                  </div>
+                </div>
+                <hr>
+                {% endfor %}
+              </form>
         </div>
     </div>
     <div class="footer">
