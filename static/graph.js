@@ -1,81 +1,76 @@
-var list_accounts = JSON.parse(document.getElementById('accounts').getAttribute('accounts_list'));
-for (var i = 0; i < list_accounts.length; i++){
-    var btn = document.createElement("button");
-    btn.setAttribute("id", "current-account-btn" + i);
-    btn.classList.add("current-account-btn");
-    btn.addEventListener("click", function(event) {
-        toggleButton(event.target);
-        hideOtherButtons(event.target);
+function HideOthersButtons() {
+    const currentAccountBtn = document.querySelector('.current-account-btn');
+    const epargneAccounts = document.querySelectorAll('.epargne-account');
+    const text = document.querySelectorAll('#affichage');
+    const cards = document.querySelectorAll('.card');
+
+    // Changer le bouton "Compte Courant" en croix
+    currentAccountBtn.innerHTML = '&#10005;';
+    currentAccountBtn.classList.remove('current-account-btn');
+    currentAccountBtn.classList.add('close-button');
+
+    // Cacher les autres boutons
+    epargneAccounts.forEach((btn) => {
+        btn.style.display = 'none';
     });
-    btn.innerHTML = list_accounts[i].name;
-    btn.setAttribute("name", list_accounts[i].name);
-    document.getElementById("accounts").appendChild(btn);
+
+    // Cacher les différents textes
+    text.forEach((text) => {
+        text.style.display = 'none';
+    });
+
+    // Afficher les div avec la classe "card"
+    cards.forEach((card) => {
+        card.style.display = 'inline-block';
+    });
+
+    // Ajouter un écouteur d'événement sur le bouton "Compte Courant" pour restaurer l'état initial
+    currentAccountBtn.removeEventListener('click', HideOthersButtons);
+    currentAccountBtn.addEventListener('click', ShowOthersButtons);
 }
 
-function toggleButton(button) {
-    initial_name = button.getAttribute("name");
-    if (button.classList.contains("current-account-btn")) {
-        button.classList.remove("current-account-btn");
-        button.classList.add("close-button");
-        var good_account = list_accounts.find(function(account) {
-            return account.name === initial_name;
-        });
-        document.getElementById("show_solde").innerHTML = good_account.solde + " €";
-        if (good_account.monthly_saving == null) {
-            document.getElementById("show_monthly_saving").innerHTML = "0 €";
-        } else {
-            document.getElementById("show_monthly_saving").innerHTML = good_account.monthly_saving + " €";
-        }
-        myChart.data.datasets[0].data[0] = good_account.credits;
-        myChart.data.datasets[0].data[1] = good_account.debits;
-        myChart.update();
+function ShowOthersButtons() {
+    const currentAccountBtn = document.querySelector('.close-button');
+    const epargneAccounts = document.querySelectorAll('.epargne-account');
+    const cards = document.querySelectorAll('.card');
+    const text = document.querySelectorAll('#affichage');
 
-        lineChart.data.datasets[0].data = good_account.credits_for_year;
-        lineChart.data.datasets[1].data = good_account.debits_for_year;
-        lineChart.update();
+    // Changer le bouton "Compte Courant" en son état initial
+    currentAccountBtn.innerHTML = 'Compte Courant';
+    currentAccountBtn.classList.remove('close-button');
+    currentAccountBtn.classList.add('current-account-btn');
 
-        var transactions = document.getElementsByClassName("transaction");
-        for (var i = 0; i < transactions.length; i++) {
-            transactions[i].getElementsByClassName("text-left")[0].innerHTML = good_account.transactions[i][2];
-            transactions[i].getElementsByClassName("text-center")[0].innerHTML = good_account.transactions[i][5];
-            if (good_account.transactions[i][3] == 'debit') {
-                transactions[i].getElementsByClassName("text-right")[0].innerHTML = "-" + good_account.transactions[i][4] + " €";
-            } else {
-                transactions[i].getElementsByClassName("text-right")[0].innerHTML = good_account.transactions[i][4] + " €";
-            }
-        }
+    // Afficher les autres boutons
+    epargneAccounts.forEach((btn) => {
+        btn.style.display = 'inline-block';
+    });
 
-        button.innerHTML = "X";
-    } else {
-        button.classList.remove("close-button");
-        button.classList.add("current-account-btn");
-        button.innerHTML = initial_name;
-    }
+    // Afficher les différents textes
+    text.forEach((text) => {
+        text.style.display = 'block';
+    });
+
+    // Cacher les div avec la classe "card"
+    cards.forEach((card) => {
+        card.style.display = 'none';
+    });
+
+    // Ajouter un écouteur d'événement sur le bouton "Compte Courant" pour cacher les autres boutons
+    currentAccountBtn.removeEventListener('click', ShowOthersButtons);
+    currentAccountBtn.addEventListener('click', HideOthersButtons);
 }
 
-let card_remove = true;
-function hideOtherButtons(clickedButton) {
-    const buttons = document.querySelectorAll('.current-account-btn');
-    if (card_remove) {
-        for (let i = 0; i < buttons.length; i++) {
-            if (buttons[i] !== clickedButton) {
-                buttons[i].style.display = 'none';
-            }
-        }
-    } else {
-        for (let i = 0; i < buttons.length; i++) {
-            if (buttons[i] !== clickedButton) {
-                buttons[i].style.display = 'inline-block';
-            }
-        }
-    }
-}
+// Ajouter un écouteur d'événement sur le bouton "Compte Courant" pour cacher les autres boutons
+const currentAccountBtn = document.querySelector('.current-account-btn');
+currentAccountBtn.addEventListener('click', HideOthersButtons);
+
 
 
 const circular_graph = document.getElementById('circular-graph').getContext('2d');
 let credits = document.getElementById('circular-graph').getAttribute('credits');
 let debits = document.getElementById('circular-graph').getAttribute('debits');
 let percentage = (debits / credits) * 100;
+console.log(credits)
 
 
 let myChart = new Chart(circular_graph, {
@@ -99,6 +94,7 @@ let myChart = new Chart(circular_graph, {
 const line_graph = document.getElementById('line-graph').getContext('2d');
 let credits_for_year = JSON.parse(document.getElementById('line-graph').getAttribute('credits_for_year'));
 let debits_for_year = JSON.parse(document.getElementById('line-graph').getAttribute('debits_for_year'));
+
 let lineChart = new Chart(line_graph, {
     type: 'line',
     data: {
@@ -121,31 +117,3 @@ let lineChart = new Chart(line_graph, {
         ],
     },
 });
-
-
-const buttons = document.querySelectorAll('.current-account-btn');
-const cards = document.getElementsByClassName('card');
-
-for (let i = 0; i < buttons.length; i++) {
-    buttons[i].addEventListener('click', function() {
-        if (card_remove) {
-            for (let i = 0; i < cards.length; i++) {
-                cards[i].style.display = 'block';
-            }
-            myChart.reset();
-            lineChart.reset();
-            myChart.update();
-            lineChart.update();
-            card_remove = false;
-        } else {
-            for (let i = 0; i < cards.length; i++) {
-                cards[i].style.display = 'none';
-            }
-            myChart.reset();
-            lineChart.reset();
-            myChart.update();
-            lineChart.update();
-            card_remove = true;
-        }
-    });
-}

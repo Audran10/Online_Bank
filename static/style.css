@@ -20,7 +20,7 @@ nav {
 
 .nav-link {
     color : white;
-    margin-right: 20px;
+    margin-right: 3%;
     font-size: 20px;
 }
 
@@ -32,6 +32,18 @@ nav {
 
 body {
     background-color: rgb(238, 238, 238);
+}
+
+.current-account-btn {
+    text-align: left;
+    margin-top: 20px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    background-color: white;
+    padding: 20px;
+    border: none;
+    width: 80%;
+    height: 100px;
+    margin-left: 10%;
 }
 
 .close-button {
@@ -46,16 +58,48 @@ body {
     outline: none;
 }
 
-.card {
-    display: none;
+.epargne-account {
+    text-align: left;
+    margin-top: 20px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    background-color: white;
+    padding: 20px;
+    border: none;
+    width: 80%;
+    height: 100px;
+    margin-left: 10%;
+}
+
+.epargne-name {
+    display: inline;
+}
+
+.epargne-solde {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    float: right;
+    color: #2E835F;
+}
+
+#affichage {
+    color: #2E835F;
+    font-weight: bold;
+    margin-left: 1%;
 }
 
 .username {
-    color: rgb(102, 204, 153);
+    color: #2E835F;
     font-weight: bold;
     font-size: 30px;
+    text-align: center;
+    margin-top: 3%;
+    margin-bottom: 3%;
 }
 
+.card {
+    display: none;
+}
 
 h4 {
     text-align: center;
@@ -114,10 +158,3 @@ h3 {
     color: rgb(108, 122, 137);
 }
 
-/* Footer */
-.footer {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-}

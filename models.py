@@ -39,7 +39,7 @@ class Users:
 
 
 class Accounts:
-    def __init__(self, id_account, id_user, cart_nb, name, solde, creation_date, end_date, transactions, monthly_saving, credits, debits, credits_for_year, debits_for_year):
+    def __init__(self, id_account, id_user, cart_nb, name, solde, creation_date, end_date, transactions):
         self.id_account = id_account
         self.id_user = id_user
         self.cart_nb = cart_nb
@@ -48,11 +48,6 @@ class Accounts:
         self.creation_date = creation_date
         self.end_date = end_date
         self.transactions = transactions
-        self.monthly_saving = monthly_saving
-        self.credits = credits
-        self.debits = debits
-        self.credits_for_year = credits_for_year
-        self.debits_for_year = debits_for_year
 
     
     def get_accounts_by_user(id_user):
@@ -64,15 +59,9 @@ class Accounts:
         for index, account in enumerate(accounts):
             cursor.execute('SELECT * FROM Transactions WHERE id_account = ? ORDER BY transaction_date DESC', (account[0],))
             transactions = cursor.fetchall()
-            monthly_saving = Monthly_saving.get_monthly_saving_by_account_by_user(id_user)[index]
-            credits = Transactions.get_credit_by_user(id_user)[index]
-            debits = Transactions.get_debit_by_user(id_user)[index]
-            credits_for_year = Transactions.get_credit_by_mounth(id_user)[index]
-            debits_for_year = Transactions.get_debit_by_mounth(id_user)[index]
             new_account = Accounts(
                 account[0], account[1], account[2], account[3], account[4], 
-                account[5], account[6], transactions, monthly_saving, credits, debits,
-                credits_for_year, debits_for_year
+                account[5], account[6], transactions
             )
             new_accounts.append(new_account)
         conn.close()
@@ -85,7 +74,7 @@ class Accounts:
         cursor.execute('SELECT * FROM Accounts WHERE id_user = ? AND name = ?', (id_user, name))
         account = cursor.fetchone()
         if account != None:
-            new_account = Accounts(account[0], account[1], account[2], account[3], account[4], account[5], account[6], None, None, None, None, None, None)
+            new_account = Accounts(account[0], account[1], account[2], account[3], account[4], account[5], account[6], None)
             return new_account
         else:
             return None
@@ -97,18 +86,15 @@ class Monthly_saving:
         self.amount = amount
         self.date = date
 
-    def get_monthly_saving_by_account_by_user(user_id):
-        list_all_savings = []
+    def get_monthly_saving_by_account_by_user(user_id, account):
         conn = sqlite3.connect('app.db')
         cursor = conn.cursor()
-        cursor.execute("SELECT id_account FROM Accounts WHERE id_user = ?", (user_id,))
-        account_ids = cursor.fetchall()
-        for account_id in account_ids:
-            cursor.execute('SELECT sum(amount) FROM Monthly_saving WHERE id_account = ? ORDER BY id_monthly_saving ASC', (account_id[0],))
+        cursor.execute("SELECT id_account FROM Accounts WHERE id_user = ? AND name = ?", (user_id, account))
+        account_id = cursor.fetchone()
+        if account_id != None:
+            cursor.execute("SELECT sum(amount) FROM Monthly_saving WHERE id_account = ?", (account_id[0],))
             monthly_saving = cursor.fetchone()[0]
-            list_all_savings.append(monthly_saving)
-        conn.close()
-        return list_all_savings
+            return monthly_saving
         
     
     def add_monthly_saving(id_account, amount, date):
@@ -144,72 +130,58 @@ class Transactions:
     
 
     def get_credit_by_user(user_id):
-        list_credit_accounts = []
         conn = sqlite3.connect('app.db')
         cursor = conn.cursor()
         month_year_str = datetime.datetime.now().strftime('%m-%Y')
-        cursor.execute("SELECT id_account FROM Accounts WHERE id_user = ?", (user_id,))
+        cursor.execute("SELECT id_account FROM Accounts WHERE id_user = ? AND name = ?", (user_id, "Compte courant"))
         account_ids = cursor.fetchall()
-        for account_id in account_ids:
-            cursor.execute("SELECT SUM(amount) FROM Transactions WHERE id_account = ? AND operation_type = 'credit' AND strftime('%m-%Y', transaction_date) = ?", (account_id[0], month_year_str))
+        if account_ids != None:
+            cursor.execute("SELECT SUM(amount) FROM Transactions WHERE id_account = ? AND operation_type = 'credit' AND strftime('%m-%Y', transaction_date) = ?", (account_ids[0][0], month_year_str))
             credit_sum = cursor.fetchone()[0]
-            list_credit_accounts.append(credit_sum)
-        conn.close()
-        return list_credit_accounts
+            conn.close()
+            return credit_sum
 
 
-
-    
     def get_debit_by_user(id_user):
-        list_debit_accounts = []
         conn = sqlite3.connect('app.db')
         cursor = conn.cursor()
         month_year_str = datetime.datetime.now().strftime('%m-%Y')
-        cursor.execute("SELECT id_account FROM Accounts WHERE id_user = ?", (id_user,))
+        cursor.execute("SELECT id_account FROM Accounts WHERE id_user = ? AND name = ?", (id_user, "Compte courant"))
         account_ids = cursor.fetchall()
-        for account_id in account_ids:
-            cursor.execute("SELECT SUM(amount) FROM Transactions WHERE id_account = ? AND operation_type = 'debit' AND strftime('%m-%Y', transaction_date) = ?", (account_id[0], month_year_str))
+        if account_ids != None:
+            cursor.execute("SELECT SUM(amount) FROM Transactions WHERE id_account = ? AND operation_type = 'debit' AND strftime('%m-%Y', transaction_date) = ?", (account_ids[0][0], month_year_str))
             debit_sum = cursor.fetchone()[0]
-            list_debit_accounts.append(debit_sum)
-        conn.close()
-        return list_debit_accounts
+            conn.close()
+            return debit_sum
     
 
     def get_credit_by_mounth(id_user):
+        # return a list with the sum of credits for each month of the year for the account "Compte courant"
         credit_list = []
-        credit_list_all_accounts = []
         conn = sqlite3.connect('app.db')
         cursor = conn.cursor()
-        cursor.execute("SELECT id_account FROM Accounts WHERE id_user = ?", (id_user,))
+        cursor.execute("SELECT id_account FROM Accounts WHERE id_user = ? and name = ?", (id_user, "Compte courant"))
         account_ids = cursor.fetchall()
-        for account_id in account_ids:
-            for i in range(1, 13):
-                cursor.execute("SELECT SUM(amount) FROM Transactions WHERE id_account = ? AND operation_type = 'credit' AND strftime('%m', transaction_date) = ?", (account_id[0], str(i).zfill(2)))
-                credit_sum = cursor.fetchone()[0]
-                credit_list.append(credit_sum)
-            credit_list_all_accounts.append(credit_list)
-            credit_list = []
+        for i in range(1, 13):
+            cursor.execute("SELECT SUM(amount) FROM Transactions WHERE id_account = ? AND operation_type = 'credit' AND strftime('%m', transaction_date) = ?", (account_ids[0][0], str(i).zfill(2)))
+            credit_sum = cursor.fetchone()[0]
+            credit_list.append(credit_sum)
         conn.close()
-        return credit_list_all_accounts
+        return credit_list
     
 
     def get_debit_by_mounth(id_user):
         debit_list = []
-        debit_list_all_accounts = []
         conn = sqlite3.connect('app.db')
         cursor = conn.cursor()
-        cursor.execute("SELECT id_account FROM Accounts WHERE id_user = ?", (id_user,))
-        account_ids = cursor.fetchall()
-        for account_id in account_ids:
-            for i in range(1, 13):
-                cursor.execute("SELECT SUM(amount) FROM Transactions WHERE id_account = ? AND operation_type = 'debit' AND strftime('%m', transaction_date) = ?", (account_id[0], str(i).zfill(2)))
-                debit_sum = cursor.fetchone()[0]
-                debit_list.append(debit_sum)
-            debit_list_all_accounts.append(debit_list)
-            debit_list = []
+        cursor.execute("SELECT id_account FROM Accounts WHERE id_user = ? AND name = ?", (id_user, "Compte courant"))
+        account_ids = cursor.fetchall() 
+        for i in range(1, 13):
+            cursor.execute("SELECT SUM(amount) FROM Transactions WHERE id_account = ? AND operation_type = 'debit' AND strftime('%m', transaction_date) = ?", (account_ids[0][0], str(i).zfill(2)))
+            debit_sum = cursor.fetchone()[0]
+            debit_list.append(debit_sum)
         conn.close()
-        return debit_list_all_accounts
-            
+        return debit_list
 
     def get_transactions_by_user(id_user):
         conn = sqlite3.connect('app.db')

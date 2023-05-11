@@ -30,33 +30,47 @@
     </nav>
     
     <div>
+
         {% if user %}
         <div id="accounts" accounts_list="{{ accounts_list }}"></div>
 
-        <div class="username">Hello {{ user.first_name }} {{ user.last_name }}</div>
+        <div class="username">Hello {{ user.first_name }}</div>
+        <div id="affichage">Compte Courant :</div>
+        <button class="current-account-btn">Compte Courant</button>
 
-        <div class="card" style="position: absolute; width: 55rem; margin-left: 50%;">
+        <div id="affichage">Comptes Epargne :</div>
+        {% for account in accounts %}
+        {% if account.name != "Compte courant" %}
+        <button class="epargne-account">
+            <p class="epargne-name">{{ account.name }}</p>
+            <p class="epargne-solde">+{{ account.solde }} €</p>
+        </button>
+        {% endif %}
+        {% endfor %}
+
+        <div class="card" style="position: absolute; width: 46%; margin-left: 50%; margin-top: 2%;">
             <div class="card-body">
-                <canvas id="line-graph" credits_for_year="{{ credits_for_year|safe }}" debits_for_year="{{ debits_for_year|safe }}"></canvas>
+                <canvas id="line-graph" credits_for_year="{{ credits_for_year }}" debits_for_year="{{ debits_for_year }}"></canvas>
             </div>
         </div>
 
-        <div class="card" style="position: absolute; width: 25rem; top: 50%; left: 5%;">
+        <div class="card" style="position: absolute; width: 20.9%; top: 50%; left: 5%;">
             <div class="card-body">
                 <h5 class="card-title">Monthly Income Spent</h5>
                 <canvas id="circular-graph" credits="{{ credits }}" debits="{{ debits }}" ></canvas>
             </div>
         </div>
+        
 
-        <div class="card" style="position: absolute; width: 25rem; top: 35.4%; left: 5%;">
+        <div class="card" style="position: absolute; width: 20.9%; top: 35.4%; left: 5%;">
             <div class="card-body">
                 <h5 class="card-title">Solde
-                    <p class="solde" id="show_solde"></p>
+                    <p class="solde" id="show_solde">{{ account.solde }} €</p>
                 </h5>
             </div>
         </div>
 
-        <div class="card" style="position: absolute; width: 33rem; top: 60%; left: 68.4%;">
+        <div class="card" style="position: absolute; width: 27.5%; top: 65%; left: 68.5%;">
             <div class="card-body">
                 <h5 class="card-title">Recent Transactions
                     <button class="all-transactions" onclick="showAllTransactions()">All</button>
@@ -92,10 +106,10 @@
             </div>
         </div>
 
-        <div class="card" style="position: absolute; width: 22rem; top: 60%; left: 50%;">
+        <div class="card" style="position: absolute; width: 18.3%; top: 65%; left: 50%;">
             <div class="card-body">
                 <h5 class="card-title">Saving
-                    <p class="solde" id="show_monthly_saving"></p>
+                    <p class="solde" id="show_monthly_saving">{{ monthly_saving }}</p>
                     <form method="POST" action="/monthly_saving">
                         <input type="number" name="saving">
                         <button type="submit">Save</button>
@@ -107,9 +121,6 @@
         {% else %}
         <h3>Veuillez vous connecter pour accéder à cette page</h3>
         {% endif %}
-    </div>
-    <div class="footer">
-        <p>© 2023 - Online Bank - All rights reserved</p>
     </div>
     <script src="{{url_for('static', filename='graph.js')}}"></script>
     
