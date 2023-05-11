@@ -11,6 +11,7 @@
     <title>Document</title>
 </head>
 <body>
+    {% if user %}
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
           <a class="navbar-brand" href="{{url_for('index')}}">Home</a>
@@ -21,15 +22,12 @@
             <div class="navbar-nav">
                 <a class="nav-link" href="{{url_for('create_account')}}">New Account</a>
                 <a class="nav-link" href="{{url_for('transactions')}}">Transactions</a>
-                <a class="nav-link" href="{{url_for('signup')}}">Signup</a>
-                <a class="nav-link" href="{{url_for('login')}}">Login</a>
                 <a class="nav-link" href="{{url_for('profile')}}">Profil</a>
             </div>
           </div>
         </div>
     </nav>
     <div>
-        {% if user %}
         <div id="accounts" accounts_list="{{ accounts_list }}"></div>
 
         <div class="username">Hello {{ user.first_name }} {{ user.last_name }}</div>
@@ -90,7 +88,6 @@
                 </div>
             </div>
         </div>
-
         <div class="card" style="position: absolute; width: 22rem; top: 60%; left: 50%;">
             <div class="card-body">
                 <h5 class="card-title">Saving
@@ -102,10 +99,18 @@
                 </h5>
             </div>
         </div>      
-        {% else %}
-        <h3>Veuillez vous connecter pour accéder à cette page</h3>
-        {% endif %}
     </div>
     <script src="{{url_for('static', filename='graph.js')}}"></script>
+    {% else %}
+    <h1>Welcome to Bank of France</h1>
+    <div class="btn-container">
+        <a href="{{url_for('login')}}">
+            <button class="login-btn">Login</button>
+        </a>
+        <a href="{{url_for('signup')}}">
+            <button class="register-btn">Register</button>
+        </a>
+    </div>      
+    {% endif %}
 </body>
 </html>

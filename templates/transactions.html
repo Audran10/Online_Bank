@@ -23,15 +23,12 @@
             <div class="navbar-nav">
                 <a class="nav-link" href="{{url_for('create_account')}}">New Account</a>
                 <a class="nav-link" href="{{url_for('transactions')}}">Transactions</a>
-                <a class="nav-link" href="{{url_for('signup')}}">Signup</a>
-                <a class="nav-link" href="{{url_for('login')}}">Login</a>
                 <a class="nav-link" href="{{url_for('profile')}}">Profil</a>
             </div>
           </div>
         </div>
     </nav>
     <div>
-        {% if user %}
         <div class="transactions container mt-4">
             <h3>Transactions</h3>
             <form method="POST" action="/transactions" class="transactionsForm">
@@ -56,9 +53,6 @@
                 </div>     
             </form>
         </div>
-    {% else %}
-    <h3>Veuillez vous connecter pour accéder à cette page</h3>
-    {% endif %}
     </div>
 </body>
 </html>

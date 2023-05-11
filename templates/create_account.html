@@ -23,23 +23,20 @@
             <div class="navbar-nav">
                 <a class="nav-link" href="{{url_for('create_account')}}">New Account</a>
                 <a class="nav-link" href="{{url_for('transactions')}}">Transactions</a>
-                <a class="nav-link" href="{{url_for('signup')}}">Signup</a>
-                <a class="nav-link" href="{{url_for('login')}}">Login</a>
                 <a class="nav-link" href="{{url_for('profile')}}">Profil</a>
             </div>
           </div>
         </div>
     </nav>
     <div>
-        {% if user %}
         <div class="transactions container mt-4">
             <h3>Create a new account</h3>
             <form method="POST" action="/create_account" class="newAccountForm">
                 <div class="form-group">
                     <label for="name" class="form-label">Account Type</label>
                     <select class="form-control" name="name" id="name">
-                        <option value="livret_a">Livret A</option>
-                        <option value="livret_dds">Livret de Développement Durable et Solidaire (LDDS)</option>
+                        <option value="Livret A">Livret A</option>
+                        <option value="Livret DDS">Livret de Développement Durable et Solidaire (LDDS)</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -52,9 +49,6 @@
                 </div>                        
             </form>
         </div>
-        {% else %}
-        <h3>Veuillez vous connecter pour accéder à cette page</h3>
-        {% endif %}
     </div>
 </body>
 </html>

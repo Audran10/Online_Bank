@@ -86,3 +86,9 @@ h5 {
     margin-top: 2%;
     text-align: center;
 }
+
+#logout {
+    position: absolute;
+    top: 7%;
+    right: 2%; 
+}
