@@ -25,16 +25,16 @@ def index():
     if 'user_id' in session:
         user = Users.get_user_by_id(session['user_id'])
         if user != None:
+            account = Accounts.get_account_by_user_and_name(user.id_user, "Compte courant")
             accounts = Accounts.get_accounts_by_user(user.id_user)
-            accounts_list = json.dumps([account.__dict__ for account in accounts])
             credits = Transactions.get_credit_by_user(user.id_user)
             debits = Transactions.get_debit_by_user(user.id_user)
             transactions = Transactions.get_transactions_by_user(user.id_user)
-            monthly_saving = Monthly_saving.get_monthly_saving_by_account_by_user(user.id_user)
+            monthly_saving = Monthly_saving.get_monthly_saving_by_account_by_user(user.id_user, "Compte courant")
             credits_for_year = json.dumps(Transactions.get_credit_by_mounth(user.id_user))
             debits_for_year = json.dumps(Transactions.get_debit_by_mounth(user.id_user))
-            #print(accounts_list)
-    return render_template('index.html', user=user, accounts=accounts, 
+            print(credits_for_year)        
+    return render_template('index.html', account=account, user=user, accounts=accounts, 
                            credits=credits, debits=debits, transactions=transactions, 
                            monthly_saving=monthly_saving, credits_for_year=credits_for_year,
                            debits_for_year=debits_for_year, accounts_list=accounts_list)
