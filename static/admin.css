@@ -28,21 +28,14 @@ nav {
     font-size: 20px;
 }
 
+
 body {
     background-color: rgb(238, 238, 238);
-    overflow-x: hidden;
 }
 
 h3 {
     text-align: center;
     margin-top: 50px;
-}
-
-.footer {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
 }
 
 .transactionsForm {

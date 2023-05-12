@@ -5,7 +5,7 @@ function HideOthersButtons() {
     const cards = document.querySelectorAll('.card');
 
     // Changer le bouton "Compte Courant" en croix
-    currentAccountBtn.innerHTML = '&#10005;';
+    currentAccountBtn.innerHTML = '<';
     currentAccountBtn.classList.remove('current-account-btn');
     currentAccountBtn.classList.add('close-button');
 
