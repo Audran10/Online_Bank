@@ -14,6 +14,7 @@ app.secret_key = "YP0VRND5VDXEhnC8gTABzjLU4C9obISR"
 @app.route('/', methods=['GET', 'POST'])
 def index():
     user = None
+    account = None
     accounts = None
     credits = None
     debits = None
@@ -33,19 +34,28 @@ def index():
             monthly_saving = Monthly_saving.get_monthly_saving_by_account_by_user(user.id_user, "Compte courant")
             credits_for_year = json.dumps(Transactions.get_credit_by_mounth(user.id_user))
             debits_for_year = json.dumps(Transactions.get_debit_by_mounth(user.id_user))
-            print(credits_for_year)        
     return render_template('index.html', account=account, user=user, accounts=accounts, 
                            credits=credits, debits=debits, transactions=transactions, 
                            monthly_saving=monthly_saving, credits_for_year=credits_for_year,
                            debits_for_year=debits_for_year, accounts_list=accounts_list)
 
 
-@app.route('/monthly_saving', methods=['GET', 'POST'])
+@app.route('/add_monthly_saving', methods=['GET', 'POST'])
 def monthly_saving():
     saving = request.form['saving']
     accounts = Accounts.get_accounts_by_user(session['user_id'])
     date = datetime.datetime.now().strftime("%Y-%m-%d")
     Monthly_saving.add_monthly_saving(accounts[0].id_account, saving, date)
+    return redirect(url_for('index'))
+
+
+@app.route('/remove_monthly_saving', methods=['GET', 'POST'])
+def delete_monthly_saving():
+    user = Users.get_user_by_id(session['user_id'])
+    remove_saving = request.form['remove_saving']
+    accounts = Accounts.get_accounts_by_user(session['user_id'])
+    date = datetime.datetime.now().strftime("%Y-%m-%d")
+    Monthly_saving.remove_monthly_saving(user.id_user, accounts[0].id_account, remove_saving, date)
     return redirect(url_for('index'))
 
 
@@ -84,7 +94,7 @@ def signup():
                     new_cart_nb += 1
                     cursor.execute("SELECT * FROM Accounts WHERE cart_nb = ?", (new_cart_nb,))
                     existing_cart_nb = cursor.fetchone()
-                current_date = datetime.date.today().strftime("%d-%m-%Y")
+                current_date = datetime.date.today().strftime("%Y-%m-%d")
                 cursor.execute("INSERT INTO Accounts (id_user, cart_nb, name, solde, creation_date) VALUES (?, ?, ?, ?, ?)", (user.id_user, new_cart_nb, "Compte courant", 50, current_date))
                 conn.commit()
                 conn.close()
@@ -196,6 +206,42 @@ def transactions():
     return render_template('transactions.html', user=user, accounts=accounts)
 
 
+@app.route('/transactions_admin', methods=['GET', 'POST'])
+def transactions_admin():
+    user = None
+    accounts = None
+    if 'user_id' in session:
+        conn = sqlite3.connect('app.db')
+        user = Users.get_user_by_id(session['user_id'])
+        if user == None:
+            return render_template('index.html', user=user, accounts=accounts)
+        else :
+            if request.method == 'POST':
+                beneficiary_name = request.form['beneficiary_name']
+                operation_type = request.form['operation_type']
+                amount = request.form['amount']
+                card_nb = request.form['card_number']
+                transaction_date = datetime.date.today().strftime("%Y-%m-%d")
+                cursor = conn.cursor()
+                cursor.execute("SELECT * FROM Accounts WHERE cart_nb = ?", (card_nb,))
+                account = cursor.fetchone()
+                if account == None:
+                    flash("Numéro de carte invalide")
+                else:
+                    cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (account[0], beneficiary_name, operation_type, amount, transaction_date))
+                    conn.commit()
+                    if operation_type == "credit":
+                        cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (account[4] + int(amount), account[0]))
+                        conn.commit()
+                    else:
+                        cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (account[4] - int(amount), account[0]))
+                        conn.commit()
+    return redirect(url_for('admin'))
+
+
+
+
+
 @app.route('/create_account', methods=['GET', 'POST'])
 def create_account():
     user = None 
@@ -238,6 +284,22 @@ def create_account():
                     flash("New account created successfully")
                     return redirect(url_for('index'))
             return render_template('create_account.html', user=user, accounts=accounts)
+
+
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    user = None
+    if 'user_id' in session :
+        user = Users.get_user_by_id(session['user_id'])
+        if user == None:
+            return render_template('index.html', user=user)
+        else :
+            conn = sqlite3.connect('app.db')
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM Users")
+            users = cursor.fetchall()
+            conn.close()
+    return render_template('admin.html', user=user, users=users)
  
         
 @app.route('/logout', methods=['GET', 'POST'])

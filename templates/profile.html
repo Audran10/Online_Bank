@@ -24,6 +24,9 @@
               <a class="nav-link" href="{{url_for('create_account')}}">New Account</a>
               <a class="nav-link" href="{{url_for('transactions')}}">Transactions</a>
               <a class="nav-link" href="{{url_for('profile')}}">Profil</a>
+              {% if user.role == 'admin' %}
+              <a class="nav-link" href="{{url_for('admin')}}">Admin</a>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -109,7 +112,11 @@
                     <input type="text" class="form-control" name="name" id="name" placeholder="{{ account.name }}" readonly>
                   </div>
                   <div class="col">
+                    {% if account.cart_nb == "" %}
+                    <input type="text" class="form-control" name="cart_nb" id="cart_nb"readonly>
+                    {% else %}
                     <input type="text" class="form-control" name="cart_nb" id="cart_nb" placeholder="XXXX-XXXX-XXXX-{{ account.cart_nb[-4:] }}" readonly>
+                    {% endif %}
                   </div>
                   <div class="col">
                     <input type="text" class="form-control" name="creation_date" id="creation_date" placeholder="{{ account.creation_date }}" readonly>

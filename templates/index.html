@@ -23,6 +23,9 @@
                 <a class="nav-link" href="{{url_for('create_account')}}">New Account</a>
                 <a class="nav-link" href="{{url_for('transactions')}}">Transactions</a>
                 <a class="nav-link" href="{{url_for('profile')}}">Profil</a>
+                {% if user.role == 'admin' %}
+                <a class="nav-link" href="{{url_for('admin')}}">Admin</a>
+                {% endif %}
             </div>
           </div>
         </div>
@@ -32,7 +35,10 @@
 
         <div class="username">Hello {{ user.first_name }}</div>
         <div id="affichage">Compte Courant :</div>
-        <button class="current-account-btn">Compte Courant</button>
+        <button class="current-account-btn">
+            <p class="epargne-name">Compte Courant</p>
+            <p class="epargne-solde">+{{ accounts[0].solde }} €</p>
+        </button>
 
         <div id="affichage">Comptes Epargne :</div>
         {% for account in accounts %}
@@ -44,13 +50,13 @@
         {% endif %}
         {% endfor %}
 
-        <div class="card" style="position: absolute; width: 46%; margin-left: 50%; margin-top: 2%;">
+        <div class="card" style="position: absolute; width: 46%; margin-left: 45%; margin-top: 1.5%;">
             <div class="card-body">
                 <canvas id="line-graph" credits_for_year="{{ credits_for_year }}" debits_for_year="{{ debits_for_year }}"></canvas>
             </div>
         </div>
 
-        <div class="card" style="position: absolute; width: 20.9%; top: 50%; left: 5%;">
+        <div class="card" style="position: absolute; width: 20.9%; top: 36%; left: 15%;">
             <div class="card-body">
                 <h5 class="card-title">Monthly Income Spent</h5>
                 <canvas id="circular-graph" credits="{{ credits }}" debits="{{ debits }}" ></canvas>
@@ -58,7 +64,7 @@
         </div>
         
 
-        <div class="card" style="position: absolute; width: 20.9%; top: 35.4%; left: 5%;">
+        <div class="card" style="position: absolute; width: 20.9%; top: 21%; left: 15%;">
             <div class="card-body">
                 <h5 class="card-title">Solde
                     <p class="solde" id="show_solde">{{ account.solde }} €</p>
@@ -66,13 +72,9 @@
             </div>
         </div>
 
-        <div class="card" style="position: absolute; width: 27.5%; top: 65%; left: 68.5%;">
+        <div class="card" style="position: absolute; width: 27.5%; top: 70%; left: 63.5%;">
             <div class="card-body">
-                <h5 class="card-title">Recent Transactions
-                    <button class="all-transactions" onclick="showAllTransactions()">All</button>
-                    <button class="credits" onclick="showTransactions('credit')">Credits</button>
-                    <button class="debits" onclick="showTransactions('debit')">Debits</button>
-                </h5>
+                <h5 class="card-title">Recent Transactions</h5>
                 <div class="row justify-content-between">
                     <div class="col-4">
                         <p class="text-left" style="padding-left: 10px;">Merchant</p>
@@ -85,16 +87,20 @@
                     </div>
                 </div>
                 <div id="transactions-container">
-                    {% for i in range(1, 7) %}
+                    {% for transaction in transactions[:4] %}
                     <div class="row justify-content-between transaction">
                         <div class="col-4">
-                            <p class="text-left" style="padding-left: 10px;"></p>
+                            <p class="text-left" style="padding-left: 10px;">{{ transaction.beneficiary_name }}</p>
                         </div>
                         <div class="col-4">
-                            <p class="text-center"></p>
+                            <p class="text-center">{{ transaction.transaction_date }}</p>
                         </div>
                         <div class="col-4">
-                            <p class="text-right" style="padding-right: 10px;"></p>
+                            {% if transaction.operation_type == "credit" %}
+                            <p class="text-right" style="padding-right: 10px;">+{{ transaction.amount }}</p>
+                            {% else %}
+                            <p class="text-right" style="padding-right: 10px;">-{{ transaction.amount }}</p>
+                            {% endif %}
                         </div>
                     </div>
                     {% endfor %}
@@ -102,13 +108,21 @@
             </div>
         </div>
 
-        <div class="card" style="position: absolute; width: 18.3%; top: 65%; left: 50%;">
+        <div class="card" style="position: absolute; width: 18.3%; top: 70%; left: 45%;">
             <div class="card-body">
                 <h5 class="card-title">Saving
-                    <p class="solde" id="show_monthly_saving">{{ monthly_saving }}</p>
-                    <form method="POST" action="/monthly_saving">
-                        <input type="number" name="saving">
+                    {% if monthly_saving != None %}
+                    <p class="solde" id="show_monthly_saving">{{ monthly_saving }} €</p>
+                    {% else %}
+                    <p class="solde" id="show_monthly_saving">0 €</p>
+                    {% endif %}
+                    <form method="POST" action="/add_monthly_saving" style="margin-bottom: 2%;">
+                        <input type="number" name="saving" required>
                         <button type="submit">Save</button>
+                    </form>
+                    <form method="POST" action="/remove_monthly_saving">
+                        <input type="number" name="remove_saving" required>
+                        <button type="submit">Draw</button>
                     </form>
                 </h5>
             </div>

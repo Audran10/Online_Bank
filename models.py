@@ -81,30 +81,52 @@ class Accounts:
 
 
 class Monthly_saving:
-    def __init__(self, id_monthly_saving, id_account, amount, date):
+    def __init__(self, id_monthly_saving, id_account, amount, operation_type, date):
         self.id_monthly_saving = id_monthly_saving
         self.id_account = id_account
         self.amount = amount
+        self.operation_type = operation_type
         self.date = date
 
     def get_monthly_saving_by_account_by_user(user_id, account):
+        total = 0
         conn = sqlite3.connect('app.db')
         cursor = conn.cursor()
         cursor.execute("SELECT id_account FROM Accounts WHERE id_user = ? AND name = ?", (user_id, account))
         account_id = cursor.fetchone()
         if account_id != None:
-            cursor.execute("SELECT sum(amount) FROM Monthly_saving WHERE id_account = ?", (account_id[0],))
+            cursor.execute("SELECT sum(amount) FROM Monthly_saving WHERE id_account = ? AND operation_type = ?", (account_id[0], "credit"))
             monthly_saving = cursor.fetchone()[0]
-            return monthly_saving
+            cursor.execute("SELECT sum(amount) FROM Monthly_saving WHERE id_account = ? AND operation_type = ?", (account_id[0], "debit"))
+            remove_monthly_saving = cursor.fetchone()[0]
+            if monthly_saving == None:
+                total = 0
+                return total
+            elif remove_monthly_saving == None:
+                return monthly_saving
+            else:
+                total = monthly_saving - remove_monthly_saving
+                return total
         
     
     def add_monthly_saving(id_account, amount, date):
         conn = sqlite3.connect('app.db')
         cursor = conn.cursor()
-        cursor.execute('INSERT INTO Monthly_saving (id_account, amount, date) VALUES (?, ?, ?)', (id_account, amount, date))
+        cursor.execute('INSERT INTO Monthly_saving (id_account, amount, operation_type, date) VALUES (?, ?, ?, ?)', (id_account, amount, "credit", date))
         cursor.execute('UPDATE Accounts SET solde = solde - ? WHERE id_account = ?', (amount, id_account))
         conn.commit()
         conn.close()
+    
+
+    def remove_monthly_saving(id_user, id_account, amount, date):
+        monthly_saving = Monthly_saving.get_monthly_saving_by_account_by_user(id_user, "Compte courant")
+        if monthly_saving is not None and monthly_saving >= int(amount):
+            conn = sqlite3.connect('app.db')
+            cursor = conn.cursor()
+            cursor.execute('INSERT INTO Monthly_saving (id_account, amount, operation_type, date) VALUES (?, ?, ?, ?)', (id_account, amount, "debit", date))
+            cursor.execute('UPDATE Accounts SET solde = solde + ? WHERE id_account = ?', (amount, id_account))
+            conn.commit()
+            conn.close()
 
 class Loans:
     def __init__(self, id_loan, id_account, duration, loan_amount, interest, amount_reimbursed, monthly_payment, start_date, end_date, status):
@@ -187,21 +209,17 @@ class Transactions:
     def get_transactions_by_user(id_user):
         conn = sqlite3.connect('app.db')
         cursor = conn.cursor()
-        cursor.execute('SELECT id_account FROM Accounts WHERE id_user = ?', (id_user,))
+        cursor.execute('SELECT id_account FROM Accounts WHERE id_user = ? AND name = ?', (id_user, "Compte courant"))
         account_ids = cursor.fetchall()
-        all_transactions = []
-        for account_id in account_ids:
-            cursor.execute('SELECT * FROM Transactions WHERE id_account = ? ORDER BY id_transaction DESC', (account_id[0],))
+        if account_ids != None:
+            cursor.execute('SELECT * FROM Transactions WHERE id_account = ? ORDER BY transaction_date DESC', (account_ids[0][0],))
             transactions = cursor.fetchall()
-            if transactions != None:
-                new_transactions = []
-                for transaction in transactions:
-                    new_transaction = Transactions(transaction[0], transaction[1], transaction[2], transaction[3], transaction[4], transaction[5])
-                    new_transactions.append(new_transaction)
-                all_transactions.append(new_transactions)
-                new_transactions = []
-        conn.close()
-        return all_transactions
+            new_transactions = []
+            for index, transaction in enumerate(transactions):
+                new_transaction = Transactions(transaction[0], transaction[1], transaction[2], transaction[3], transaction[4], transaction[5])
+                new_transactions.append(new_transaction)
+            conn.close()
+            return new_transactions
 
 
 
@@ -241,6 +259,7 @@ def create_db():
             id_monthly_saving INTEGER PRIMARY KEY AUTOINCREMENT,
             id_account INTEGER NOT NULL,
             amount INTEGER NOT NULL,
+            operation_type TEXT NOT NULL,
             date DATE NOT NULL,
             FOREIGN KEY (id_account) REFERENCES Account(id_account)
         );
