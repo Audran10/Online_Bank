@@ -57,5 +57,38 @@
             </form>
         </div>
     </div>
+
+    <div>
+        <div class="transactions container mt-4">
+            <h3>Transfer</h3>
+            <form method="POST" action="/transfer" class="transactionsForm">
+                <div class="form-group">
+                    <label for="operation_type" class="form-label">Operation Type</label>
+                    <select class="form-control" name="operation_type" id="operationType">
+                        <option value="debit">Debit</option>
+                        <option value="credit">Credit</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="input_description">Account</label>
+                    <select class="form-control" name="epargne_account" id="account">
+                        {% for account in accounts %}
+                        {% if account.name != "Compte courant" %}
+                        <option value="{{ account.name }}">{{ account.name }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="input_amount">Amount</label>
+                    <input type="number" class="form-control" name="amount" id="input_amount" placeholder="Enter amount" min="1">
+                </div>
+                <div class="saveButton">
+                    <button class="saveBtn btn btn-primary" type=submit/>Submit</button><br/>
+                    <span class="successfully-saved">User info updated sucessfully</span>
+                </div>     
+            </form>
+        </div>
+    </div>
 </body>
 </html>
