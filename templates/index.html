@@ -43,7 +43,7 @@
         <div id="affichage">Comptes Epargne :</div>
         {% for account in accounts %}
         {% if account.name != "Compte courant" %}
-        <button class="epargne-account">
+        <button class="epargne-account" onclick="showInputs()">
             <p class="epargne-name">{{ account.name }}</p>
             <p class="epargne-solde">+{{ account.solde }} €</p>
         </button>
@@ -74,7 +74,7 @@
 
         <div class="card" style="position: absolute; width: 27.5%; top: 70%; left: 63.5%;">
             <div class="card-body">
-                <h5 class="card-title">Recent Transactions</h5>
+                <h5 class="card-title">Transactions</h5>
                 <div class="row justify-content-between">
                     <div class="col-4">
                         <p class="text-left" style="padding-left: 10px;">Merchant</p>
@@ -118,11 +118,11 @@
                     {% endif %}
                     <form method="POST" action="/add_monthly_saving" style="margin-bottom: 2%;">
                         <input type="number" name="saving" required>
-                        <button type="submit">Save</button>
+                        <button type="submit" id="submit-saving">Save</button>
                     </form>
                     <form method="POST" action="/remove_monthly_saving">
                         <input type="number" name="remove_saving" required>
-                        <button type="submit">Draw</button>
+                        <button type="submit" id="submit-saving">Draw</button>
                     </form>
                 </h5>
             </div>

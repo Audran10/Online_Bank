@@ -219,7 +219,7 @@ class Transactions:
                 new_transaction = Transactions(transaction[0], transaction[1], transaction[2], transaction[3], transaction[4], transaction[5])
                 new_transactions.append(new_transaction)
             conn.close()
-            return new_transactions
+            return list(reversed(new_transactions))
 
 
 

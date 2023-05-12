@@ -123,34 +123,33 @@ def profile():
     accounts = None
     if 'user_id' in session:
         user = Users.get_user_by_id(session['user_id'])
-        if user == None:
-            return render_template('index.html', user=user, accounts=accounts)
-        else :
-            accounts = Accounts.get_accounts_by_user(user.id_user)
-            for account in accounts:
-                account.cart_nb = str(account.cart_nb)
-            if request.method == 'POST':
-                conn = sqlite3.connect('app.db')
-                cursor = conn.cursor()
-                if request.form['email'] == "":
-                    email = user.email
-                else:
-                    email = request.form['email']
-                if request.form['phone'] == "":
-                    phone_number = user.phone_number
-                else:
-                    phone_number = request.form['phone']
-                if request.form['address'] == "":
-                    address = user.address
-                else:
-                    address = request.form['address']
-                if request.form['password'] == "":
-                    password = user.password
-                else:
-                    password = hashlib.sha256(request.form['password'].encode()).hexdigest()
-                cursor = conn.cursor()
-                cursor.execute("UPDATE Users SET email=?, password=?, phone_number=?, address=? WHERE id_user=?", (email, password, phone_number, address, user.id_user))
-                conn.commit()
+    else :
+        return render_template('index.html', user=user, accounts=accounts)
+    accounts = Accounts.get_accounts_by_user(user.id_user)
+    for account in accounts:
+        account.cart_nb = str(account.cart_nb)
+    if request.method == 'POST':
+        conn = sqlite3.connect('app.db')
+        cursor = conn.cursor()
+        if request.form['email'] == "":
+            email = user.email
+        else:
+            email = request.form['email']
+        if request.form['phone'] == "":
+            phone_number = user.phone_number
+        else:
+            phone_number = request.form['phone']
+        if request.form['address'] == "":
+            address = user.address
+        else:
+            address = request.form['address']
+        if request.form['password'] == "":
+            password = user.password
+        else:
+            password = hashlib.sha256(request.form['password'].encode()).hexdigest()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE Users SET email=?, password=?, phone_number=?, address=? WHERE id_user=?", (email, password, phone_number, address, user.id_user))
+        conn.commit()
     return render_template('profile.html', user=user, accounts=accounts)
 
 
@@ -182,27 +181,27 @@ def transactions():
     if 'user_id' in session:
         conn = sqlite3.connect('app.db')
         user = Users.get_user_by_id(session['user_id'])
-        if user == None:
-            return render_template('index.html', user=user, accounts=accounts)
-        else :
-            accounts = Accounts.get_accounts_by_user(user.id_user)
-            if request.method == 'POST':
-                beneficiary_name = request.form['beneficiary_name']
-                operation_type = request.form['operation_type']
-                amount = request.form['amount']
-                transaction_date = datetime.date.today().strftime("%Y-%m-%d")
-                cursor = conn.cursor()
-                if operation_type == "debit" and int(amount) > accounts[0].solde:
-                    flash("Solde insuffisant")
-                else:
-                    cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (accounts[0].id_account, beneficiary_name, operation_type, amount, transaction_date))
-                    conn.commit()
-                    if operation_type == "credit":
-                        cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (accounts[0].solde + int(amount), accounts[0].id_account))
-                        conn.commit()
-                    else:
-                        cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (accounts[0].solde - int(amount), accounts[0].id_account))
-                        conn.commit()   
+    else :
+        return render_template('index.html', user=user, accounts=accounts)
+
+    accounts = Accounts.get_accounts_by_user(user.id_user)
+    if request.method == 'POST':
+        beneficiary_name = request.form['beneficiary_name']
+        operation_type = request.form['operation_type']
+        amount = request.form['amount']
+        transaction_date = datetime.date.today().strftime("%Y-%m-%d")
+        cursor = conn.cursor()
+        if operation_type == "debit" and int(amount) > accounts[0].solde:
+            flash("Solde insuffisant")
+        else:
+            cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (accounts[0].id_account, beneficiary_name, operation_type, amount, transaction_date))
+            conn.commit()
+            if operation_type == "credit":
+                cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (accounts[0].solde + int(amount), accounts[0].id_account))
+                conn.commit()
+            else:
+                cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (accounts[0].solde - int(amount), accounts[0].id_account))
+                conn.commit()   
     return render_template('transactions.html', user=user, accounts=accounts)
 
 
@@ -213,33 +212,66 @@ def transactions_admin():
     if 'user_id' in session:
         conn = sqlite3.connect('app.db')
         user = Users.get_user_by_id(session['user_id'])
-        if user == None:
-            return render_template('index.html', user=user, accounts=accounts)
-        else :
-            if request.method == 'POST':
-                beneficiary_name = request.form['beneficiary_name']
-                operation_type = request.form['operation_type']
-                amount = request.form['amount']
-                card_nb = request.form['card_number']
-                transaction_date = datetime.date.today().strftime("%Y-%m-%d")
-                cursor = conn.cursor()
-                cursor.execute("SELECT * FROM Accounts WHERE cart_nb = ?", (card_nb,))
-                account = cursor.fetchone()
-                if account == None:
-                    flash("Numéro de carte invalide")
-                else:
-                    cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (account[0], beneficiary_name, operation_type, amount, transaction_date))
-                    conn.commit()
-                    if operation_type == "credit":
-                        cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (account[4] + int(amount), account[0]))
-                        conn.commit()
-                    else:
-                        cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (account[4] - int(amount), account[0]))
-                        conn.commit()
+    else :
+        return render_template('index.html', user=user, accounts=accounts)
+
+    if request.method == 'POST':
+        beneficiary_name = request.form['beneficiary_name']
+        operation_type = request.form['operation_type']
+        amount = request.form['amount']
+        card_nb = request.form['card_number']
+        transaction_date = datetime.date.today().strftime("%Y-%m-%d")
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM Accounts WHERE cart_nb = ?", (card_nb,))
+        account = cursor.fetchone()
+        if account == None:
+            flash("Numéro de carte invalide")
+        else:
+            cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (account[0], beneficiary_name, operation_type, amount, transaction_date))
+            conn.commit()
+            if operation_type == "credit":
+                cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (account[4] + int(amount), account[0]))
+                conn.commit()
+            else:
+                cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (account[4] - int(amount), account[0]))
+                conn.commit()
     return redirect(url_for('admin'))
 
 
-
+@app.route('/transfer', methods=['GET', 'POST'])
+def transfer():
+    user = None
+    accounts = None
+    if 'user_id' in session:
+        conn = sqlite3.connect('app.db')
+        user = Users.get_user_by_id(session['user_id'])
+    else :
+        return render_template('index.html', user=user, accounts=accounts)
+        
+    operation_type = request.form['operation_type']
+    epargne_account = request.form['epargne_account']
+    amount = request.form['amount']
+    transaction_date = datetime.date.today().strftime("%Y-%m-%d")
+    cursor = conn.cursor()
+    if operation_type == "debit" and int(amount) < Accounts.get_account_by_user_and_name(user.id_user, "Compte courant").solde:
+        cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user.id_user, "Compte courant").id_account, "transfer", "credit", amount, transaction_date))
+        conn.commit()
+        cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user.id_user, epargne_account).id_account, "transfer", "debit", amount, transaction_date))
+        conn.commit()
+        cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (Accounts.get_account_by_user_and_name(user.id_user, "Compte courant").solde + int(amount), Accounts.get_account_by_user_and_name(user.id_user, "Compte courant").id_account))
+        conn.commit()
+        cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (Accounts.get_account_by_user_and_name(user.id_user, epargne_account).solde - int(amount), Accounts.get_account_by_user_and_name(user.id_user, epargne_account).id_account))
+        conn.commit()
+    elif operation_type == "credit" and int(amount) < Accounts.get_account_by_user_and_name(user.id_user, "Compte courant").solde:
+        cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user.id_user, "Compte courant").id_account, "transfer", "debit", amount, transaction_date))
+        conn.commit()
+        cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user.id_user, epargne_account).id_account, "transfer", "credit", amount, transaction_date))
+        conn.commit()
+        cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (Accounts.get_account_by_user_and_name(user.id_user, "Compte courant").solde - int(amount), Accounts.get_account_by_user_and_name(user.id_user, "Compte courant").id_account))
+        conn.commit()
+        cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (Accounts.get_account_by_user_and_name(user.id_user, epargne_account).solde + int(amount), Accounts.get_account_by_user_and_name(user.id_user, epargne_account).id_account))
+        conn.commit()
+    return redirect(url_for('transactions'))
 
 
 @app.route('/create_account', methods=['GET', 'POST'])
@@ -248,42 +280,42 @@ def create_account():
     accounts = None
     if 'user_id' in session:
         user = Users.get_user_by_id(session['user_id'])
-        if user == None:
-            return render_template('index.html', user=user, accounts=accounts)
-        else :
-            accounts = Accounts.get_accounts_by_user(user.id_user)
-            if request.method == 'POST':
-                accounts = Accounts.get_accounts_by_user(user.id_user)
-                name = request.form['name']
-                user_id = session['user_id']
-                creation_date = datetime.date.today().strftime("%Y-%m-%d")
-                cart_nb = None
-                solde_compte_courant = Accounts.get_account_by_user_and_name(user_id, "Compte courant").solde 
-                solde = request.form['solde']
-                if int(solde) <= 50:
-                    solde = 50 
-                else : 
-                    solde = solde
-                if solde_compte_courant < int(solde):
-                    flash("Solde insuffisant")
-                elif name == "Livret A" and Accounts.get_account_by_user_and_name(user_id, "Livret A") != None:
-                    flash("You cannot create more than one Livret A")
-                elif name == "Livret DDS" and Accounts.get_account_by_user_and_name(user_id, "Livret DDS") != None:
-                    flash("You cannot create more than one Livret A")
-                else:
-                    new_solde_compte_courant = Accounts.get_account_by_user_and_name(user_id, "Compte courant").solde - int(solde) 
-                    conn = sqlite3.connect('app.db')
-                    cursor = conn.cursor()
-                    cursor.execute("INSERT INTO Accounts (id_user, cart_nb, name, solde, creation_date) VALUES (?, ?, ?, ?, ?)", (user_id, cart_nb, name, solde, creation_date))
-                    cursor.execute("UPDATE Accounts SET solde = ? WHERE id_user = ? AND name = ?", (new_solde_compte_courant, user_id, "Compte courant"))
-                    conn.commit()
-                    cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user_id, name).id_account, "account opening", "credit", solde, creation_date))
-                    cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user_id, "Compte courant").id_account, "account opening", "debit", solde, creation_date))
-                    conn.commit()
-                    conn.close()
-                    flash("New account created successfully")
-                    return redirect(url_for('index'))
-            return render_template('create_account.html', user=user, accounts=accounts)
+    else :
+        return render_template('index.html', user=user, accounts=accounts)
+
+    accounts = Accounts.get_accounts_by_user(user.id_user)
+    if request.method == 'POST':
+        accounts = Accounts.get_accounts_by_user(user.id_user)
+        name = request.form['name']
+        user_id = session['user_id']
+        creation_date = datetime.date.today().strftime("%Y-%m-%d")
+        cart_nb = None
+        solde_compte_courant = Accounts.get_account_by_user_and_name(user_id, "Compte courant").solde 
+        solde = request.form['solde']
+        if int(solde) <= 50:
+            solde = 50 
+        else : 
+            solde = solde
+        if solde_compte_courant < int(solde):
+            flash("Solde insuffisant")
+        elif name == "Livret A" and Accounts.get_account_by_user_and_name(user_id, "Livret A") != None:
+            flash("You cannot create more than one Livret A")
+        elif name == "Livret DDS" and Accounts.get_account_by_user_and_name(user_id, "Livret DDS") != None:
+            flash("You cannot create more than one Livret A")
+        else:
+            new_solde_compte_courant = Accounts.get_account_by_user_and_name(user_id, "Compte courant").solde - int(solde) 
+            conn = sqlite3.connect('app.db')
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO Accounts (id_user, cart_nb, name, solde, creation_date) VALUES (?, ?, ?, ?, ?)", (user_id, cart_nb, name, solde, creation_date))
+            cursor.execute("UPDATE Accounts SET solde = ? WHERE id_user = ? AND name = ?", (new_solde_compte_courant, user_id, "Compte courant"))
+            conn.commit()
+            cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user_id, name).id_account, "account opening", "credit", solde, creation_date))
+            cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user_id, "Compte courant").id_account, "account opening", "debit", solde, creation_date))
+            conn.commit()
+            conn.close()
+            flash("New account created successfully")
+            return redirect(url_for('index'))
+    return render_template('create_account.html', user=user, accounts=accounts)
 
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -291,14 +323,14 @@ def admin():
     user = None
     if 'user_id' in session :
         user = Users.get_user_by_id(session['user_id'])
-        if user == None:
-            return render_template('index.html', user=user)
-        else :
-            conn = sqlite3.connect('app.db')
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM Users")
-            users = cursor.fetchall()
-            conn.close()
+    else :
+        return render_template('index.html', user=user)
+        
+    conn = sqlite3.connect('app.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Users")
+    users = cursor.fetchall()
+    conn.close()
     return render_template('admin.html', user=user, users=users)
  
         

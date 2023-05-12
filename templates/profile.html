@@ -112,7 +112,7 @@
                     <input type="text" class="form-control" name="name" id="name" placeholder="{{ account.name }}" readonly>
                   </div>
                   <div class="col">
-                    {% if account.cart_nb == "" %}
+                    {% if account.cart_nb == 'None' %}
                     <input type="text" class="form-control" name="cart_nb" id="cart_nb"readonly>
                     {% else %}
                     <input type="text" class="form-control" name="cart_nb" id="cart_nb" placeholder="XXXX-XXXX-XXXX-{{ account.cart_nb[-4:] }}" readonly>

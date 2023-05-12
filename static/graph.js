@@ -60,6 +60,7 @@ function ShowOthersButtons() {
     currentAccountBtn.addEventListener('click', HideOthersButtons);
 }
 
+
 // Ajouter un écouteur d'événement sur le bouton "Compte Courant" pour cacher les autres boutons
 const currentAccountBtn = document.querySelector('.current-account-btn');
 currentAccountBtn.addEventListener('click', HideOthersButtons);

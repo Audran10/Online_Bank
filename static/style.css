@@ -187,3 +187,10 @@ h1 {
     background-color: #5fae8d;
 }
 
+#submit-saving {
+    background-color: #2E835F;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    border-radius: 5px;
+}
