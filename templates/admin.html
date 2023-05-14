@@ -19,7 +19,7 @@
             <div class="navbar-nav">
               <a class="nav-link" href="{{url_for('create_account')}}">New Account</a>
               <a class="nav-link" href="{{url_for('transactions')}}">Transactions</a>
-              <a class="nav-link" href="{{url_for('profile')}}">Profil</a>
+              <a class="nav-link" href="{{url_for('profile')}}">Profile</a>
               {% if user.role == 'admin' %}
               <a class="nav-link" href="{{url_for('admin')}}">Admin</a>
               {% endif %}
@@ -57,7 +57,6 @@
             </form>
         </div>
     </div>
-
     <div>
         <div class="transactions container mt-4">
             <h3>Users</h3>
