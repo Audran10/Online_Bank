@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, session, redirect, url_for, jsonify
+from flask import Flask, render_template, request, flash, session, redirect, url_for
 import json
 import hashlib
 from models import *
@@ -26,12 +26,12 @@ def index():
     if 'user_id' in session:
         user = Users.get_user_by_id(session['user_id'])
         if user != None:
-            account = Accounts.get_account_by_user_and_name(user.id_user, "Compte courant")
+            account = Accounts.get_account_by_user_and_name(user.id_user, "Checking Account")
             accounts = Accounts.get_accounts_by_user(user.id_user)
             credits = Transactions.get_credit_by_user(user.id_user)
             debits = Transactions.get_debit_by_user(user.id_user)
             transactions = Transactions.get_transactions_by_user(user.id_user)
-            monthly_saving = Monthly_saving.get_monthly_saving_by_account_by_user(user.id_user, "Compte courant")
+            monthly_saving = Monthly_saving.get_monthly_saving_by_account_by_user(user.id_user, "Checking Account")
             credits_for_year = json.dumps(Transactions.get_credit_by_mounth(user.id_user))
             debits_for_year = json.dumps(Transactions.get_debit_by_mounth(user.id_user))
     return render_template('index.html', account=account, user=user, accounts=accounts, 
@@ -95,7 +95,7 @@ def signup():
                     cursor.execute("SELECT * FROM Accounts WHERE cart_nb = ?", (new_cart_nb,))
                     existing_cart_nb = cursor.fetchone()
                 current_date = datetime.date.today().strftime("%Y-%m-%d")
-                cursor.execute("INSERT INTO Accounts (id_user, cart_nb, name, solde, creation_date) VALUES (?, ?, ?, ?, ?)", (user.id_user, new_cart_nb, "Compte courant", 50, current_date))
+                cursor.execute("INSERT INTO Accounts (id_user, cart_nb, name, solde, creation_date) VALUES (?, ?, ?, ?, ?)", (user.id_user, new_cart_nb, "Checking Account", 50, current_date))
                 conn.commit()
                 conn.close()
                 return redirect(url_for('login'))
@@ -162,8 +162,6 @@ def delete_account():
         conn.commit()
         cursor.execute("DELETE FROM Monthly_saving WHERE id_account IN (SELECT id_account FROM Accounts WHERE id_user=?)", (session['user_id'],))
         conn.commit()
-        cursor.execute("DELETE FROM Loans WHERE id_account IN (SELECT id_account FROM Accounts WHERE id_user=?)", (session['user_id'],))
-        conn.commit()
         cursor.execute("DELETE FROM Users WHERE id_user=?", (session['user_id'],))
         conn.commit()
         cursor.execute("DELETE FROM Accounts WHERE id_user=?", (session['user_id'],))
@@ -183,7 +181,6 @@ def transactions():
         user = Users.get_user_by_id(session['user_id'])
     else :
         return render_template('index.html', user=user, accounts=accounts)
-
     accounts = Accounts.get_accounts_by_user(user.id_user)
     if request.method == 'POST':
         beneficiary_name = request.form['beneficiary_name']
@@ -214,7 +211,6 @@ def transactions_admin():
         user = Users.get_user_by_id(session['user_id'])
     else :
         return render_template('index.html', user=user, accounts=accounts)
-
     if request.method == 'POST':
         beneficiary_name = request.form['beneficiary_name']
         operation_type = request.form['operation_type']
@@ -247,27 +243,26 @@ def transfer():
         user = Users.get_user_by_id(session['user_id'])
     else :
         return render_template('index.html', user=user, accounts=accounts)
-        
     operation_type = request.form['operation_type']
     epargne_account = request.form['epargne_account']
     amount = request.form['amount']
     transaction_date = datetime.date.today().strftime("%Y-%m-%d")
     cursor = conn.cursor()
-    if operation_type == "debit" and int(amount) < Accounts.get_account_by_user_and_name(user.id_user, "Compte courant").solde:
-        cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user.id_user, "Compte courant").id_account, "transfer", "credit", amount, transaction_date))
+    if operation_type == "debit" and int(amount) < Accounts.get_account_by_user_and_name(user.id_user, "Checking Account").solde:
+        cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user.id_user, "Checking Account").id_account, "Transfer", "credit", amount, transaction_date))
         conn.commit()
-        cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user.id_user, epargne_account).id_account, "transfer", "debit", amount, transaction_date))
+        cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user.id_user, epargne_account).id_account, "Transfer", "debit", amount, transaction_date))
         conn.commit()
-        cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (Accounts.get_account_by_user_and_name(user.id_user, "Compte courant").solde + int(amount), Accounts.get_account_by_user_and_name(user.id_user, "Compte courant").id_account))
+        cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (Accounts.get_account_by_user_and_name(user.id_user, "Checking Account").solde + int(amount), Accounts.get_account_by_user_and_name(user.id_user, "Checking Account").id_account))
         conn.commit()
         cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (Accounts.get_account_by_user_and_name(user.id_user, epargne_account).solde - int(amount), Accounts.get_account_by_user_and_name(user.id_user, epargne_account).id_account))
         conn.commit()
-    elif operation_type == "credit" and int(amount) < Accounts.get_account_by_user_and_name(user.id_user, "Compte courant").solde:
-        cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user.id_user, "Compte courant").id_account, "transfer", "debit", amount, transaction_date))
+    elif operation_type == "credit" and int(amount) < Accounts.get_account_by_user_and_name(user.id_user, "Checking Account").solde:
+        cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user.id_user, "Checking Account").id_account, "Transfer", "debit", amount, transaction_date))
         conn.commit()
-        cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user.id_user, epargne_account).id_account, "transfer", "credit", amount, transaction_date))
+        cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user.id_user, epargne_account).id_account, "Transfer", "credit", amount, transaction_date))
         conn.commit()
-        cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (Accounts.get_account_by_user_and_name(user.id_user, "Compte courant").solde - int(amount), Accounts.get_account_by_user_and_name(user.id_user, "Compte courant").id_account))
+        cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (Accounts.get_account_by_user_and_name(user.id_user, "Checking Account").solde - int(amount), Accounts.get_account_by_user_and_name(user.id_user, "Checking Account").id_account))
         conn.commit()
         cursor.execute("UPDATE Accounts SET solde = ? WHERE id_account = ?", (Accounts.get_account_by_user_and_name(user.id_user, epargne_account).solde + int(amount), Accounts.get_account_by_user_and_name(user.id_user, epargne_account).id_account))
         conn.commit()
@@ -282,7 +277,6 @@ def create_account():
         user = Users.get_user_by_id(session['user_id'])
     else :
         return render_template('index.html', user=user, accounts=accounts)
-
     accounts = Accounts.get_accounts_by_user(user.id_user)
     if request.method == 'POST':
         accounts = Accounts.get_accounts_by_user(user.id_user)
@@ -290,7 +284,7 @@ def create_account():
         user_id = session['user_id']
         creation_date = datetime.date.today().strftime("%Y-%m-%d")
         cart_nb = None
-        solde_compte_courant = Accounts.get_account_by_user_and_name(user_id, "Compte courant").solde 
+        solde_compte_courant = Accounts.get_account_by_user_and_name(user_id, "Checking Account").solde 
         solde = request.form['solde']
         if int(solde) <= 50:
             solde = 50 
@@ -298,19 +292,19 @@ def create_account():
             solde = solde
         if solde_compte_courant < int(solde):
             flash("Solde insuffisant")
-        elif name == "Livret A" and Accounts.get_account_by_user_and_name(user_id, "Livret A") != None:
-            flash("You cannot create more than one Livret A")
-        elif name == "Livret DDS" and Accounts.get_account_by_user_and_name(user_id, "Livret DDS") != None:
-            flash("You cannot create more than one Livret A")
+        elif name == "A Account" and Accounts.get_account_by_user_and_name(user_id, "A Account") != None:
+            flash("You cannot create more than one A Account")
+        elif name == "DDS Account" and Accounts.get_account_by_user_and_name(user_id, "DDS Account") != None:
+            flash("You cannot create more than one A Account")
         else:
-            new_solde_compte_courant = Accounts.get_account_by_user_and_name(user_id, "Compte courant").solde - int(solde) 
+            new_solde_compte_courant = Accounts.get_account_by_user_and_name(user_id, "Checking Account").solde - int(solde) 
             conn = sqlite3.connect('app.db')
             cursor = conn.cursor()
             cursor.execute("INSERT INTO Accounts (id_user, cart_nb, name, solde, creation_date) VALUES (?, ?, ?, ?, ?)", (user_id, cart_nb, name, solde, creation_date))
-            cursor.execute("UPDATE Accounts SET solde = ? WHERE id_user = ? AND name = ?", (new_solde_compte_courant, user_id, "Compte courant"))
+            cursor.execute("UPDATE Accounts SET solde = ? WHERE id_user = ? AND name = ?", (new_solde_compte_courant, user_id, "Checking Account"))
             conn.commit()
-            cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user_id, name).id_account, "account opening", "credit", solde, creation_date))
-            cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user_id, "Compte courant").id_account, "account opening", "debit", solde, creation_date))
+            cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user_id, name).id_account, "Account opening", "credit", solde, creation_date))
+            cursor.execute("INSERT INTO Transactions (id_account, beneficiary_name, operation_type, amount, transaction_date) VALUES (?, ?, ?, ?, ?)", (Accounts.get_account_by_user_and_name(user_id, "Checking Account").id_account, "Account opening", "debit", solde, creation_date))
             conn.commit()
             conn.close()
             flash("New account created successfully")
@@ -325,7 +319,6 @@ def admin():
         user = Users.get_user_by_id(session['user_id'])
     else :
         return render_template('index.html', user=user)
-        
     conn = sqlite3.connect('app.db')
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM Users")

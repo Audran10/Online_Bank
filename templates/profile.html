@@ -23,7 +23,7 @@
             <div class="navbar-nav">
               <a class="nav-link" href="{{url_for('create_account')}}">New Account</a>
               <a class="nav-link" href="{{url_for('transactions')}}">Transactions</a>
-              <a class="nav-link" href="{{url_for('profile')}}">Profil</a>
+              <a class="nav-link" href="{{url_for('profile')}}">Profile</a>
               {% if user.role == 'admin' %}
               <a class="nav-link" href="{{url_for('admin')}}">Admin</a>
               {% endif %}
@@ -54,7 +54,7 @@
                   </div>
               </div>
               <div class="form-group">
-                  <label for="address">Address</label>
+                  <label for="address">Home Address</label>
                   <input type="address" class="form-control" name="address" id="address" placeholder="{{ user.address }}">
               </div>
               <div class="form-group">
@@ -102,9 +102,6 @@
                   <div class="col">
                     <label for="creation_date">Creation Date</label>
                   </div>
-                  <div class="col text-right">
-                    <label for="creation_date">Forgot Card Number?</label>
-                  </div>
                 </div> 
                 {% for account in accounts %}
                 <div class="row">
@@ -120,9 +117,6 @@
                   </div>
                   <div class="col">
                     <input type="text" class="form-control" name="creation_date" id="creation_date" placeholder="{{ account.creation_date }}" readonly>
-                  </div>
-                  <div class="col text-right">
-                    <button class="saveBtn btn btn-primary" id="sendEmail" type=submit/>Send email</button>
                   </div>
                 </div>
                 <hr>

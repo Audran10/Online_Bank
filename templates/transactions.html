@@ -23,7 +23,7 @@
             <div class="navbar-nav">
                 <a class="nav-link" href="{{url_for('create_account')}}">New Account</a>
                 <a class="nav-link" href="{{url_for('transactions')}}">Transactions</a>
-                <a class="nav-link" href="{{url_for('profile')}}">Profil</a>
+                <a class="nav-link" href="{{url_for('profile')}}">Profile</a>
                 {% if user.role == 'admin' %}
                 <a class="nav-link" href="{{url_for('admin')}}">Admin</a>
                 {% endif %}
@@ -73,7 +73,7 @@
                     <label for="input_description">Account</label>
                     <select class="form-control" name="epargne_account" id="account">
                         {% for account in accounts %}
-                        {% if account.name != "Compte courant" %}
+                        {% if account.name != "Checking Account" %}
                         <option value="{{ account.name }}">{{ account.name }}</option>
                         {% endif %}
                         {% endfor %}

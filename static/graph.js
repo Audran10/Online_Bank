@@ -4,7 +4,7 @@ function HideOthersButtons() {
     const text = document.querySelectorAll('#affichage');
     const cards = document.querySelectorAll('.card');
 
-    // Changer le bouton "Compte Courant" en croix
+    // Changer le bouton "Checking Account" en croix
     currentAccountBtn.innerHTML = '<';
     currentAccountBtn.classList.remove('current-account-btn');
     currentAccountBtn.classList.add('close-button');
@@ -24,10 +24,11 @@ function HideOthersButtons() {
         card.style.display = 'inline-block';
     });
 
-    // Ajouter un écouteur d'événement sur le bouton "Compte Courant" pour restaurer l'état initial
+    // Ajouter un écouteur d'événement sur le bouton "Checking Account" pour restaurer l'état initial
     currentAccountBtn.removeEventListener('click', HideOthersButtons);
     currentAccountBtn.addEventListener('click', ShowOthersButtons);
 }
+
 
 function ShowOthersButtons() {
     const currentAccountBtn = document.querySelector('.close-button');
@@ -35,8 +36,8 @@ function ShowOthersButtons() {
     const cards = document.querySelectorAll('.card');
     const text = document.querySelectorAll('#affichage');
 
-    // Changer le bouton "Compte Courant" en son état initial
-    currentAccountBtn.innerHTML = 'Compte Courant';
+    // Changer le bouton "Checking Account" en son état initial
+    currentAccountBtn.innerHTML = 'Checking Account';
     currentAccountBtn.classList.remove('close-button');
     currentAccountBtn.classList.add('current-account-btn');
 
@@ -55,16 +56,15 @@ function ShowOthersButtons() {
         card.style.display = 'none';
     });
 
-    // Ajouter un écouteur d'événement sur le bouton "Compte Courant" pour cacher les autres boutons
+    // Ajouter un écouteur d'événement sur le bouton "Checking Account" pour cacher les autres boutons
     currentAccountBtn.removeEventListener('click', ShowOthersButtons);
     currentAccountBtn.addEventListener('click', HideOthersButtons);
 }
 
 
-// Ajouter un écouteur d'événement sur le bouton "Compte Courant" pour cacher les autres boutons
+// Ajouter un écouteur d'événement sur le bouton "Checking Account" pour cacher les autres boutons
 const currentAccountBtn = document.querySelector('.current-account-btn');
 currentAccountBtn.addEventListener('click', HideOthersButtons);
-
 
 
 const circular_graph = document.getElementById('circular-graph').getContext('2d');
@@ -91,6 +91,7 @@ let myChart = new Chart(circular_graph, {
         ],
     },
 });
+
 
 const line_graph = document.getElementById('line-graph').getContext('2d');
 let credits_for_year = JSON.parse(document.getElementById('line-graph').getAttribute('credits_for_year'));

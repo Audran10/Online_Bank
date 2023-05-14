@@ -23,7 +23,7 @@
             <div class="navbar-nav">
                 <a class="nav-link" href="{{url_for('create_account')}}">New Account</a>
                 <a class="nav-link" href="{{url_for('transactions')}}">Transactions</a>
-                <a class="nav-link" href="{{url_for('profile')}}">Profil</a>
+                <a class="nav-link" href="{{url_for('profile')}}">Profile</a>
                 {% if user.role == 'admin' %}
                 <a class="nav-link" href="{{url_for('admin')}}">Admin</a>
                 {% endif %}
@@ -38,8 +38,8 @@
                 <div class="form-group">
                     <label for="name" class="form-label">Account Type</label>
                     <select class="form-control" name="name" id="name">
-                        <option value="Livret A">Livret A</option>
-                        <option value="Livret DDS">Livret de Développement Durable et Solidaire (LDDS)</option>
+                        <option value="A Account">A Account</option>
+                        <option value="DDS Account">DDS Account</option>
                     </select>
                 </div>
                 <div class="form-group">
